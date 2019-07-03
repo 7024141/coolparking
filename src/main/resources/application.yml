@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://106.52.83.177/Êý¾Ý¿âÃû³Æ?characterEncoding=utf-8&useSSL=false
+  jpa:
+    show-sql: true
+  jackson:
+    default-property-inclusion: non_null
+  mvc:
+    view:
+      prefix: /WEB-INF/
+      suffix: .jsp
+
+server:
+  context-path: /coolparking
