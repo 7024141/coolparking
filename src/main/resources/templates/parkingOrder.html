@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>车库管理员主界面</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this templates -->
+    <link href="jumbotron.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">酷泊车</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a th:href="@{/pservice/pmain(parkingId=${parkingId},parkingName=${parkingName},parkingCarports=${parkingCarports})}" >车位</a></li>
+                <li><a th:href="@{/pservice/porder(parkingId=${parkingId},parkingName=${parkingName},parkingCarports=${parkingCarports})}" >订单</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <br/><br/>
+        <h2 th:text="${'第'+parkingId+'车库'}"></h2>
+        <p th:text="${'这里是'+parkingName}"></p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">了解更多&raquo;</a></p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-md-8">
+            <h2>已完成订单信息</h2>
+            <table style="width: 100%;table-layout: fixed">
+                <thead>
+                <tr>
+                    <<th><h3>订单号</h3></th>
+                    <th><h3>微信号</h3></th>
+                    <th><h3>车牌号</h3></th>
+                    <th><h3>进入时间</h3></th>
+                    <th><h3>离开时间</h3></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="parkingOrder : ${parkingOrders}">
+                    <span th:if="${parkingOrder.isOrderState()}">
+                    <th scope="row"> <h3 th:text="${parkingOrder.getOrderId()}"></h3></th>
+                    <td> <h3 th:text="${parkingOrder.getOpenId()}"></h3></td>
+                    <td><h3 th:text="${parkingOrder.getCarportNum()}"></h3></td>
+                    <td><h3 th:text="${parkingOrder.getCreateTime()}"></h3></td>
+                    <td><h3 th:text="${parkingOrder.getFinishTime()}"></h3></td>
+                    </span>
+                </tr>
+                </tbody>
+            </table>
+
+            <div>
+                <button class="btn btn-primary btn-lg" id="controlButton" th:onclick="'javascript:ShowUnfinishedOrder()'">显示未完成订单</button>
+            </div>
+
+            <div id="UnfinishedOrder" style="display: none">
+                <table style="width: 100%;table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th><h3>订单号</h3></th>
+                        <th><h3>车牌号</h3></th>
+                        <th><h3>进入时间</h3></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="parkingOrder : ${parkingOrders}">
+            <span th:if="${!parkingOrder.isOrderState()}">
+                <th scope="row"><h3 th:text="${parkingOrder.getOrderId()}"></h3> </th>
+                <td><h3 th:text="${parkingOrder.getCarportNum()}"></h3></td>
+                <td><h3 th:text="${parkingOrder.getCreateTime()}"></h3></td>
+            </span>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <h3>请看过来！！！</h3>
+            <p>如有问题，请致电 </p>
+            <p>xxx-xxxx-xxxx</p>
+            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div>
+    </div>
+    <hr>
+    <footer>
+        <p>&copy; 2019 university, Inc.</p>
+    </footer>
+</div> <!-- /container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
+<script type="text/javascript">
+    function ShowUnfinishedOrder() {
+        var div = document.getElementById("UnfinishedOrder").style.display;
+        if(div=='none'){
+            document.getElementById("UnfinishedOrder").style.display='block';
+            document.getElementById("controlButton").innerText='隐藏未完成订单';
+        }
+        else {
+            document.getElementById("UnfinishedOrder").style.display='none';
+            document.getElementById("controlButton").innerText='显示未完成订单';
+        }
+    }
+</script>
+</body>
+</html>
+
+
