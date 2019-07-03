@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: root
-    url: jdbc:mysql://106.52.83.177/Êý¾Ý¿âÃû³Æ?characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://106.52.83.177/mydata?characterEncoding=utf-8&useSSL=false&zeroDateTimeBehavior=convertToNull
   jpa:
     show-sql: true
   jackson:
@@ -15,3 +15,5 @@ spring:
 
 server:
   context-path: /coolparking
+
+
