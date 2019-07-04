@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UserService {
     List<ParkingOrder> findOrderById(String openId);
+    void createOrder(int parkingId,String carNum);
 }

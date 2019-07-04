@@ -32,8 +32,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a th:href="@{/pservice/pmain(parkingId=${parkingId},parkingName=${parkingName},parkingCarports=${parkingCarports})}" >车位</a></li>
-                <li><a th:href="@{/pservice/porder(parkingId=${parkingId},parkingName=${parkingName},parkingCarports=${parkingCarports})}" >订单</a></li>
+                <li><a th:href="@{/pservice/pmain(parkingId=${parkingId})}" >车位</a></li>
+                <li><a th:href="@{/pservice/porder(parkingId=${parkingId})}" >订单</a></li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">

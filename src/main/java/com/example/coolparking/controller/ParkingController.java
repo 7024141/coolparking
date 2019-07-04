@@ -20,39 +20,47 @@ public class ParkingController {
 
     @RequestMapping("/pmain")
     public String parkingMain(Model model,AdminInfo adminInfo){
-        if(parkingService.parkingLoginState(adminInfo.getParkingId())){
+        if(parkingService.parkingLoginState(adminInfo.getParkingId())&&adminInfo.getPassword()==null){
             model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
             model.addAttribute("parkingId", adminInfo.getParkingId());
             model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
             return "parkingMain";
         }
-        String str = parkingService.parkingMain(adminInfo.getParkingId(),adminInfo.getPassword());
-        if(str.equals("密码错误")){
-            //弹窗
-            return "parkingLogin";
+        else {
+//            if(parkingService.parkingLoginState(adminInfo.getParkingId())){
+//                //禁止登录
+//                System.out.println("禁止登录");
+//                return "parkingLogin";
+//            }
+            String str = parkingService.parkingMain(adminInfo.getParkingId(),adminInfo.getPassword());
+            if(str.equals("密码错误")){
+                //弹窗
+                return "redirect:/pservice/plogin";
+            }
+            else if(str.equals("用户不存在")){
+                //弹窗
+                return "redirect:/pservice/plogin";
+            }
+            else if(str.equals("登录成功")){
+                //
+                model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
+                model.addAttribute("parkingId", adminInfo.getParkingId());
+                model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
+                return "parkingMain";
+            }
+            return "redirect:/pservice/plogin";
         }
-        else if(str.equals("用户不存在")){
-            //弹窗
-            return "parkingLogin";
-        }
-        else if(str.equals("登录成功")){
-            //
-            model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
-            model.addAttribute("parkingId", adminInfo.getParkingId());
-            model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
-            return "parkingMain";
-        }
-        return "parkingLogin";
     }
 
     @RequestMapping("/pedit")
     public String parkingEdit(int parkingId,String parkingCarportNum,boolean ableState) {
         if (parkingService.parkingCarportEdit(parkingId, parkingCarportNum, ableState)) {
-            return "redirect:/pservice/pmain?parkingId=" + parkingId;
+            System.out.println("更新成功");
         } else {
             //更新失败
-            return "redirect:/pservice/pmain?parkingId=" + parkingId;
+            System.out.println("更新失败");
         }
+        return "redirect:/pservice/pmain?parkingId=" + parkingId;
     }
 
     @RequestMapping("/porder")

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserService userService;
-    @RequestMapping("uorder")
+    @RequestMapping("ucheckorder")
     @ResponseBody
     public Map findOrderById(String openId){
         System.out.println(openId);
@@ -23,4 +24,14 @@ public class UserController {
         map.put("list",userService.findOrderById(openId));
         return map;
     }
+
+    @RequestMapping("ucreateorder")
+    @ResponseBody
+    public String createOrder(int parkingId, String carNum){
+        System.out.println(parkingId+"lllllllllll"+carNum);
+        userService.createOrder(parkingId,carNum);
+        return "666";
+    }
 }
+
+

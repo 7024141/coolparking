@@ -3,6 +3,7 @@ package com.example.coolparking.dao;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.utils.TableNameProviderUtil;
 import org.apache.ibatis.annotations.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -16,6 +17,13 @@ public interface ParkingCarportDao {
     @SelectProvider(type = TableNameProviderUtil.class,method = "selectCarportSQL")
     List<ParkingCarport> parkingFindAllCarports(String parkingCarportTableName);
 
-    @UpdateProvider(type = TableNameProviderUtil.class,method = "updateCarportSQL")
+    @UpdateProvider(type = TableNameProviderUtil.class,method = "updateCarportAbleSQL")
     boolean parkingCarportEdit(String parkingCarportTableName,String parkingCarportNum,boolean ableState);
+
+    @ResultMap("carportMap")
+    @SelectProvider(type = TableNameProviderUtil.class,method = "selectFreeCarportSQL")
+    List<ParkingCarport> parkingFindFreeCarports(String parkingCarportTableName);
+
+    @UpdateProvider(type = TableNameProviderUtil.class,method = "updateCarportUseSQL")
+    boolean parkingCarportUseEdit(String parkingCarportTableName,String parkingCarportNum,boolean carState);
 }

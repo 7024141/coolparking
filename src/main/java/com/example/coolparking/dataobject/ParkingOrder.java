@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -18,8 +19,8 @@ public class ParkingOrder {
     private int parkingId;
     private String carportNum;
     private String openId;
-    private String createTime;
-    private String finishTime;
+    private Timestamp createTime;
+    private Timestamp finishTime;
     private boolean orderState;
     public ParkingOrder(){
 
