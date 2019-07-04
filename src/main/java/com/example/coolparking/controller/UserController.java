@@ -32,6 +32,12 @@ public class UserController {
         userService.createOrder(parkingId,carNum);
         return "666";
     }
+
+    @RequestMapping("/uprice")
+    @ResponseBody
+    public Map getOrderPrice(String license, String openId){
+        return userService.getPrice(license,openId);
+    }
 }
 
 

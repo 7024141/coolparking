@@ -16,5 +16,8 @@ public interface ParkingOrderDao extends JpaRepository<ParkingOrder,String> {
     @Transactional
     @Query(value = "insert into parking_order(order_id,license_num,parking_id,carport_num) values(?1,?2,?3,?4)", nativeQuery = true)
     void createOrder(String orderId, String licenseNum, int parkingId, String carportNum);
+
+    @Query(value = "select * from parking_order where license_num=?1 AND order_state=?2",nativeQuery = true)
+    List<ParkingOrder> findLeaveOrder(String license,int state);
 }
 

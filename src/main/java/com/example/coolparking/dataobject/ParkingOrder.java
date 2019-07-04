@@ -19,8 +19,8 @@ public class ParkingOrder {
     private int parkingId;
     private String carportNum;
     private String openId;
-    private Timestamp createTime;
-    private Timestamp finishTime;
+    private String createTime;
+    private String finishTime;
     private boolean orderState;
     public ParkingOrder(){
 
