@@ -6,11 +6,16 @@ import com.example.coolparking.dao.ParkingInfoDao;
 import com.example.coolparking.dao.ParkingOrderDao;
 import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
+import com.example.coolparking.dataobject.ParkingInfo;
 import com.example.coolparking.dataobject.ParkingOrder;
 import com.example.coolparking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -72,5 +77,34 @@ public class ParkingServiceImpl implements ParkingService {
     @Override
     public boolean parkingLoginState(int parkingId){
         return adminInfoDao.findById(parkingId).orElse(null).isLoginState();
+    }
+
+    @Override
+    public BigDecimal parkingGetPrice(int parkingId){
+        return parkingInfoDao.findById(parkingId).orElse(null).getParkingPrice();
+    }
+
+    @Override
+    public boolean parkingSetPrice(int parkingId,String parkingPrice){
+        try{
+            BigDecimal bigDecimal=new BigDecimal(parkingPrice);
+            ParkingInfo parkingInfo = parkingInfoDao.findById(parkingId).orElse(null);
+            parkingInfo.setParkingPrice(bigDecimal);
+            parkingInfoDao.save(parkingInfo);
+        }
+        catch (Exception e){
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public Page<ParkingCarport> findAll(Pageable pageable,int parkingId){
+        List<ParkingCarport> parkingCarportList=parkingCarportDao.parkingFindAllCarports(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable());
+        int start=(int)pageable.getOffset();
+        int end=(start+pageable.getPageSize())>parkingCarportList.size()?parkingCarportList.size():(start+pageable.getPageSize());
+        Page<ParkingCarport> parkingCarportPage=new PageImpl<ParkingCarport>(parkingCarportList.subList(start,end),pageable,parkingCarportList.size());
+        return parkingCarportPage;
     }
 }

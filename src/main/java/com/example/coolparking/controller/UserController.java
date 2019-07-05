@@ -28,7 +28,6 @@ public class UserController {
     @RequestMapping("ucreateorder")
     @ResponseBody
     public String createOrder(int parkingId, String carNum){
-        System.out.println(parkingId+"lllllllllll"+carNum);
         userService.createOrder(parkingId,carNum);
         return "666";
     }
@@ -38,6 +37,19 @@ public class UserController {
     public Map getOrderPrice(String license, String openId){
         return userService.getPrice(license,openId);
     }
+
+    @RequestMapping("/upay")
+    @ResponseBody
+    public String payOrder(String orderId,String msg){
+        if(msg!=null){
+            if(msg.equals("支付成功")) {
+                userService.payOrderSuccess(orderId);
+            }
+        }
+        return "666";
+    }
+
+
 }
 
 

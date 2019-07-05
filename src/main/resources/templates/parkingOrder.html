@@ -28,12 +28,13 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">酷泊车</a>
+            <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a th:href="@{/pservice/pmain(parkingId=${parkingId})}" >车位</a></li>
-                <li><a th:href="@{/pservice/porder(parkingId=${parkingId})}" >订单</a></li>
+                <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
+                <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
+                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage})}" >订单</a></li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
@@ -46,22 +47,21 @@
 <div class="jumbotron">
     <div class="container">
         <br/><br/>
-        <h2 th:text="${'第'+parkingId+'车库'}"></h2>
+        <h2 th:text="${'No.'+parkingId}"></h2>
         <p th:text="${'这里是'+parkingName}"></p>
-        <p><a class="btn btn-primary btn-lg" href="#" role="button">了解更多&raquo;</a></p>
+        <p><a class="btn btn-primary btn-lg" href="javascript:void(0)" role="button">了解更多&raquo;</a></p>
     </div>
 </div>
 
 <div class="container">
     <!-- Example row of columns -->
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <h2>已完成订单信息</h2>
             <table style="width: 100%;table-layout: fixed">
                 <thead>
                 <tr>
                     <<th><h3>订单号</h3></th>
-                    <th><h3>微信号</h3></th>
                     <th><h3>车牌号</h3></th>
                     <th><h3>进入时间</h3></th>
                     <th><h3>离开时间</h3></th>
@@ -71,7 +71,6 @@
                 <tr th:each="parkingOrder : ${parkingOrders}">
                     <span th:if="${parkingOrder.isOrderState()}">
                     <th scope="row"> <h3 th:text="${parkingOrder.getOrderId()}"></h3></th>
-                    <td> <h3 th:text="${parkingOrder.getOpenId()}"></h3></td>
                     <td><h3 th:text="${parkingOrder.getCarportNum()}"></h3></td>
                     <td><h3 th:text="${parkingOrder.getCreateTime()}"></h3></td>
                     <td><h3 th:text="${parkingOrder.getFinishTime()}"></h3></td>
@@ -106,7 +105,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-2">
             <h3>请看过来！！！</h3>
             <p>如有问题，请致电 </p>
             <p>xxx-xxxx-xxxx</p>
@@ -119,6 +118,39 @@
     </footer>
 </div> <!-- /container -->
 
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    价格管理
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
+                <p>您希望的价格是：</p>
+                <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal">取消
+                </button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="ModifyUnitPrice()">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<p id="parkingId" th:text="${parkingId}" style="display: none"></p>
+<p id="parkingPrice" th:text="${parkingPrice}" style="display:none"></p>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -140,6 +172,38 @@
             document.getElementById("UnfinishedOrder").style.display='none';
             document.getElementById("controlButton").innerText='显示未完成订单';
         }
+    }
+    function ModifyUnitPrice() {
+        let parkingPrice=document.getElementById("parkingPrice").innerText;
+        let newPrice=document.getElementById("newPrice").value;
+        let parkingId=document.getElementById("parkingId").innerText;
+        if(newPrice!=parkingPrice&&newPrice!=null){
+            let ajax = GetXmlHttpObject();
+            let randomNum=new Date().getTime();
+            ajax.onreadystatechange = function () {
+                if (ajax.readyState==4 &&ajax.status==200) {
+                    if(ajax.responseText=="true"){
+                        alert("修改成功！");
+                        document.getElementById("toOrder").click();
+                    }
+                    else {
+                        alert("修改失败！");
+                    }
+                }
+            }
+            ajax.open('post','/coolparking/pservice/pmodifyprice',false);
+            ajax.setRequestHeader('content-type','application/json');
+            ajax.send('{\'parkingId\':'+parkingId+',\'parkingPrice\':'+newPrice+',\'randomNum\':'+randomNum+'}');
+        }
+    }
+    function GetXmlHttpObject(){
+        if (window.XMLHttpRequest){
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }else{// code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        return xmlhttp;
     }
 </script>
 </body>

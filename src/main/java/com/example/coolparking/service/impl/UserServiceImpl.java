@@ -28,7 +28,16 @@ public class UserServiceImpl implements UserService {
     ParkingInfoDao parkingInfoDao;
     @Override
     public List<ParkingOrder> findOrderById(String openId) {
-        return parkingOrderDao.findOrderById(openId);
+        List<ParkingOrder> list = parkingOrderDao.findOrderById(openId);
+        for(int i=0;i<list.size();i++){
+            String s=list.get(i).getCreateTime();
+            list.get(i).setCreateTime(s.substring(0,s.length()-2));
+            s=list.get(i).getFinishTime();
+            if(s!=null){
+                list.get(i).setFinishTime(s.substring(0,s.length()-2));
+            }
+        }
+        return list;
     }
 
     @Override
@@ -68,4 +77,14 @@ public class UserServiceImpl implements UserService {
         return map;
     }
 
+    @Override
+    public void payOrderSuccess(String orderId){
+        ParkingOrder parkingOrder=parkingOrderDao.findById(orderId).orElse(null);
+        int parkingId=parkingOrder.getParkingId();
+        if(parkingOrder!=null){
+            parkingOrder.setOrderState(true);
+            parkingOrderDao.save(parkingOrder);
+            parkingCarportDao.parkingCarportUseEdit(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable(),parkingOrder.getCarportNum(),true);
+        }
+    }
 }

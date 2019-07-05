@@ -20,6 +20,8 @@
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <![endif]-->
 </head>
 
@@ -28,12 +30,14 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">酷泊车</a>
+            <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a th:href="@{/pservice/pmain(parkingId=${parkingId})}" >车位</a></li>
-                <li><a th:href="@{/pservice/porder(parkingId=${parkingId})}" >订单</a></li>
+                <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
+                <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
+                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage})}" >订单</a></li>
+                <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
@@ -46,9 +50,9 @@
 <div class="jumbotron">
     <div class="container">
         <br/><br/>
-        <h2 th:text="${'第'+parkingId+'车库'}"></h2>
+        <h2 th:text="${'No.'+parkingId}"></h2>
         <p th:text="${'这里是'+parkingName}"></p>
-        <p><a class="btn btn-primary btn-lg" href="#" role="button">了解更多&raquo;</a></p>
+        <p><a class="btn btn-primary btn-lg" href="javascript:void(0)" role="button">了解更多&raquo;</a></p>
     </div>
 </div>
 
@@ -66,21 +70,40 @@
                 <th><h3>禁用/启用</h3></th>
                 </thead>
                 <tbody align="center">
-                <tr th:each="parkingCarport : ${parkingCarports}">
+                <tr th:each="parkingCarport : ${parkingCarportPage}">
                     <th scope="row"> <h3 th:text="${parkingCarport.getCarportNum()}"></h3></th>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
                     <td ><h3 th:text="${parkingCarport.isCarState()?'有车':'无车'}"></h3> </td>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <td ><h3><a th:href="@{/pservice/pedit(parkingId=${parkingId},parkingCarportNum=${parkingCarport.getCarportNum()},ableState=${parkingCarport.isAbleState()})}" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
+                    <td ><h3><a th:href="@{/pservice/pedit(parkingId=${parkingId},page=${currentPage},parkingCarportNum=${parkingCarport.getCarportNum()},ableState=${parkingCarport.isAbleState()})}" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
                 </tr>
                 </tbody>
             </table>
+
+            <ul class="pagination right">
+                <li th:class="${currentPage<1?'disabled':''}">
+                    <a th:if="${currentPage < 1}" href="javascript:void(0)">上一页</a>
+                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>
+                </li>
+                <li th:each="number:${#numbers.sequence(0,parkingCarportPage.totalPages - 1)}" th:class="${currentPage==number?'active':''}" >
+                    <a th:if="${currentPage==number}" href="javascript:void(0)">
+                        <span th:text="${number+1}"></span>
+                    </a>
+                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${number})}">
+                        <span th:text="${number+1}"></span>
+                    </a>
+                </li>
+                <li th:class="${currentPage+1 >= parkingCarportPage.totalPages?'disabled':''}">
+                    <a th:if="${currentPage+1 >= parkingCarportPage.totalPages}" href="javascript:void(0)">下一页</a>
+                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>
+                </li>
+            </ul>
         </div>
         <div class="col-md-4">
             <h3>请看过来！！！</h3>
             <p>如有问题，请致电 </p>
             <p>xxx-xxxx-xxxx</p>
-            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="javascript:void(0)" role="button">View details &raquo;</a></p>
         </div>
     </div>
     <hr>
@@ -89,6 +112,39 @@
     </footer>
 </div> <!-- /container -->
 
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    价格管理
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
+                <p>您希望的价格是：</p>
+                <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal">取消
+                </button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="ModifyUnitPrice()">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<p id="parkingId" th:text="${parkingId}" style="display: none"></p>
+<p id="parkingPrice" th:text="${parkingPrice}" style="display:none"></p>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -98,5 +154,39 @@
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+<script type="text/javascript">
+    function ModifyUnitPrice() {
+        let parkingPrice=document.getElementById("parkingPrice").innerText;
+        let newPrice=document.getElementById("newPrice").value;
+        let parkingId=document.getElementById("parkingId").innerText;
+        if(newPrice!=parkingPrice&&newPrice!=null){
+            let ajax = GetXmlHttpObject();
+            let randomNum=new Date().getTime();
+            ajax.onreadystatechange = function () {
+                if (ajax.readyState==4 &&ajax.status==200) {
+                    if(ajax.responseText=="true"){
+                        alert("修改成功！");
+                        document.getElementById("toCarport").click();
+                    }
+                    else {
+                        alert("修改失败！");
+                    }
+                }
+            }
+            ajax.open('post','/coolparking/pservice/pmodifyprice',false);
+            ajax.setRequestHeader('content-type','application/json');
+            ajax.send('{\'parkingId\':'+parkingId+',\'parkingPrice\':'+newPrice+',\'randomNum\':'+randomNum+'}');
+        }
+    }
+    function GetXmlHttpObject(){
+        if (window.XMLHttpRequest){
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }else{// code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        return xmlhttp;
+    }
+</script>
 </body>
 </html>
