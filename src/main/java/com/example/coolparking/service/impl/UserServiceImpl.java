@@ -5,6 +5,7 @@ import com.example.coolparking.dao.ParkingInfoDao;
 import com.example.coolparking.dao.ParkingOrderDao;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
+import com.example.coolparking.log.Log;
 import com.example.coolparking.service.UserService;
 import com.example.coolparking.utils.OrderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,17 @@ public class UserServiceImpl implements UserService {
         ParkingOrder p = OrderUtil.orderCreate(parkingId, carNum, pc.getCarportNum());
         parkingOrderDao.createOrder(p.getOrderId(), p.getLicenseNum(), p.getParkingId(), p.getCarportNum());
         parkingCarportDao.parkingCarportUseEdit(tableName,pc.getCarportNum(),pc.isCarState());
+
+        //写入内容
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateTime = df.format(date);
+        String content = "<p>"+dateTime + "    小车（"+carNum+ "）进入"+"停车位（"+p.getCarportNum()+"）"+"</p>\r\n";
+        //写入文件路径
+        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+        String dateTime2 = df2.format(date);
+        String path = ".\\txtlog\\"+p.getParkingId()+"-"+dateTime2+".txt";
+        Log.bwFile( path, content,true);
     }
 
     @Override
@@ -78,6 +90,17 @@ public class UserServiceImpl implements UserService {
             parkingOrder.setOrderState(true);
             parkingOrderDao.save(parkingOrder);
             parkingCarportDao.parkingCarportUseEdit(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable(),parkingOrder.getCarportNum(),true);
+
+            //写入内容
+            Date date = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dateTime = df.format(date);
+            String content = "<p>"+dateTime + "    小车（"+parkingOrder.getLicenseNum()+ "）离开停车位（"+parkingOrder.getCarportNum()+"）"+"</p>\r\n";
+            //写入文件路径
+            SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+            String dateTime2 = df2.format(date);
+            String path = ".\\txtlog\\"+parkingId+"-"+dateTime2+".txt";
+            Log.bwFile( path, content,true);
         }
     }
 }

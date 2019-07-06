@@ -2,6 +2,7 @@ package com.example.coolparking.controller;
 
 import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
+import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -16,6 +17,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Controller
 @RequestMapping("/pservice")
@@ -120,5 +123,31 @@ public class ParkingController {
                 response.getWriter().print("false");
             }
         }
+    }
+
+    @RequestMapping("/pgetlog")
+    public void pGetLog(HttpServletRequest request,HttpServletResponse response) throws IOException, JSONException {
+        int id;
+
+        int len = request.getContentLength();
+        byte[] callbackBody = new byte[len];
+        try {
+            ServletInputStream sis = request.getInputStream();
+            sis.read(callbackBody, 0, len);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //接收json数据
+        JSONObject jsonObject = new JSONObject(new String(callbackBody));
+        id = jsonObject.getInt("parkingId");
+
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String dateTime = df.format(date);
+        String path = ".\\txtlog\\"+id+"-"+dateTime+".txt";
+        String log = Log.brFile(path);
+
+        response.setCharacterEncoding("utf-8");
+        response.getWriter().print(log);
     }
 }
