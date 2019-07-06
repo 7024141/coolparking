@@ -2,10 +2,7 @@ package com.example.coolparking.dataobject;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Data
@@ -13,11 +10,12 @@ import java.math.BigDecimal;
 @Table(name = "parking_info")
 public class ParkingInfo {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int parkingId;
     private String parkingName;
     private String carportTable;
-    private BigDecimal parkingPrice;
+    @Column(name = "parkingPrice",columnDefinition="3.0",nullable=false)
+    private BigDecimal parkingPrice = new BigDecimal(3.0);
     public ParkingInfo(){
 
     }
