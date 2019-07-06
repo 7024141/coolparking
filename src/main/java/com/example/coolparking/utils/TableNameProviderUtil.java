@@ -18,4 +18,19 @@ public class TableNameProviderUtil {
     public String updateCarportUseSQL(String parkingCarportTableName,String parkingCarportNum,boolean carState){
         return new SQL().UPDATE(parkingCarportTableName).SET("car_state="+(carState?0:1)).WHERE("carport_num='"+parkingCarportNum+"'").toString();
     }
+
+    public String createParkingSQL(String tablename){
+        String sql = "create table "+tablename+"(carport_num varchar(8) primary key,car_state tinyint(1),able_state tinyint(1))";
+        return sql;
+    }
+
+    public String insertParkingSQL(String tablename, int carportnum){
+        String sql = "insert into " + tablename + " values";
+        for(int i=1;i<carportnum;i++){
+            sql += "(concat('T'," + i + "),0,1),";
+        }
+        sql += "(concat('T'," + carportnum + "),0,1)";
+
+        return sql;
+    }
 }
