@@ -184,7 +184,16 @@
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
+    window.onload=function () {
+        var type=[[${type}]];
+        if(type=='recentOrder'){
+            document.getElementById("typeButton").innerText='近一月订单';
+        }
+        else if(type=='allOrder'){
+            document.getElementById("typeButton").innerText='全部订单';
+        }
+    }
     function ShowUnfinishedOrder() {
         var div = document.getElementById("unfinishedOrder").style.display;
         if(div=='none'){
