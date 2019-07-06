@@ -19,5 +19,9 @@ public interface ParkingOrderDao extends JpaRepository<ParkingOrder,String> {
 
     @Query(value = "select * from parking_order where license_num=?1 AND order_state=?2",nativeQuery = true)
     List<ParkingOrder> findLeaveOrder(String license,int state);
+
+    @Query(value = "select * from parking_order where DATEDIFF(create_time,?2)>=0 AND parking_id = ?1",nativeQuery = true)
+    List<ParkingOrder> findRecentOrder(int parkingId,String currentTime);
+
 }
 

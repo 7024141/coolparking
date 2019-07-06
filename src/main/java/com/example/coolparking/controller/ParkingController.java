@@ -33,7 +33,6 @@ public class ParkingController {
         if(parkingService.parkingLoginState(adminInfo.getParkingId())&&adminInfo.getPassword()==null){
             PageRequest pageRequest=PageRequest.of(page,size);
             Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,adminInfo.getParkingId());
-            //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
             model.addAttribute("parkingId", adminInfo.getParkingId());
             model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
             model.addAttribute("parkingPrice", parkingService.parkingGetPrice(adminInfo.getParkingId()).toString());
@@ -59,12 +58,11 @@ public class ParkingController {
             else if(str.equals("登录成功")){
                 PageRequest pageRequest=PageRequest.of(page,size);
                 Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,adminInfo.getParkingId());
-                //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
                 model.addAttribute("parkingId", adminInfo.getParkingId());
-                model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
                 model.addAttribute("parkingPrice", parkingService.parkingGetPrice(adminInfo.getParkingId()).toString());
-                model.addAttribute("parkingCarportPage",parkingCarportPage);
+                model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
                 model.addAttribute("currentPage",page);
+                model.addAttribute("parkingCarportPage",parkingCarportPage);
                 return "parkingMain";
             }
             return "redirect:/pservice/plogin";
@@ -83,14 +81,24 @@ public class ParkingController {
     }
 
     @RequestMapping("/porder")
-    public String parkingToOrder(Model model,int parkingId,int page){
+    public String parkingToOrder(Model model,int parkingId,int page,String type){
+        if(type!=null){
+            model.addAttribute("type",type);
+            if(type.equals("recentOrder")){
+                model.addAttribute("parkingOrders",parkingService.parkingFindRecentOrders(parkingId));
+            }
+            else if(type.equals("allOrder")){
+                model.addAttribute("parkingOrders",parkingService.parkingFindAllOrders(parkingId));
+            }
+        }
         model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
-        model.addAttribute("parkingOrders",parkingService.parkingFindAllOrders(parkingId));
         model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
         model.addAttribute("parkingId",parkingId);
+        model.addAttribute("type",type);
         model.addAttribute("currentPage",page);
         return "parkingOrder";
     }
+
 
     @RequestMapping("/pmodifyprice")
     public void parkingModifyPrice(HttpServletRequest request,HttpServletResponse response) throws IOException, JSONException {

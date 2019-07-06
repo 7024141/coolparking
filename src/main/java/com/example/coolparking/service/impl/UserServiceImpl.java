@@ -6,7 +6,7 @@ import com.example.coolparking.dao.ParkingOrderDao;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
 import com.example.coolparking.service.UserService;
-import com.example.coolparking.utils.OrderCreateUtil;
+import com.example.coolparking.utils.OrderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<ParkingOrder> findOrderById(String openId) {
         List<ParkingOrder> list = parkingOrderDao.findOrderById(openId);
-        for(int i=0;i<list.size();i++){
-            String s=list.get(i).getCreateTime();
-            list.get(i).setCreateTime(s.substring(0,s.length()-2));
-            s=list.get(i).getFinishTime();
-            if(s!=null){
-                list.get(i).setFinishTime(s.substring(0,s.length()-2));
-            }
-        }
+        list =OrderUtil.modifyTime(list);
         return list;
     }
 
@@ -44,7 +37,7 @@ public class UserServiceImpl implements UserService {
     public void createOrder(int parkingId,String carNum) {
         String tableName=parkingInfoDao.findById(parkingId).orElse(null).getCarportTable();
         ParkingCarport pc=parkingCarportDao.parkingFindFreeCarports(tableName).get(0);
-        ParkingOrder p = OrderCreateUtil.orderCreate(parkingId, carNum, pc.getCarportNum());
+        ParkingOrder p = OrderUtil.orderCreate(parkingId, carNum, pc.getCarportNum());
         parkingOrderDao.createOrder(p.getOrderId(), p.getLicenseNum(), p.getParkingId(), p.getCarportNum());
         parkingCarportDao.parkingCarportUseEdit(tableName,pc.getCarportNum(),pc.isCarState());
     }

@@ -26,4 +26,6 @@ public interface ParkingService {
     boolean parkingSetPrice(int parkingId,String parkingPrice);
 
     Page<ParkingCarport> findAll(Pageable pageable,int parkingId);
+
+    List<ParkingOrder> parkingFindRecentOrders(int parkingId);
 }

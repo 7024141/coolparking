@@ -34,7 +34,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
                 <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
-                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage})}" >订单</a></li>
+                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type=${type})}" >订单</a></li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
@@ -49,7 +49,16 @@
         <br/><br/>
         <h2 th:text="${'No.'+parkingId}"></h2>
         <p th:text="${'这里是'+parkingName}"></p>
-        <p><a class="btn btn-primary btn-lg" href="javascript:void(0)" role="button">了解更多&raquo;</a></p>
+
+        <div class="btn-group dropdown" id="dropdown">
+            <button id="typeButton" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: x-large">
+                近一月订单 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type='recentOrder')}">近一月订单</a></li>
+                <li><a th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type='allOrder')}">全部订单</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -57,33 +66,47 @@
     <!-- Example row of columns -->
     <div class="row">
         <div class="col-md-10">
-            <h2>已完成订单信息</h2>
-            <table style="width: 100%;table-layout: fixed">
-                <thead>
-                <tr>
-                    <<th><h3>订单号</h3></th>
-                    <th><h3>车牌号</h3></th>
-                    <th><h3>进入时间</h3></th>
-                    <th><h3>离开时间</h3></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="parkingOrder : ${parkingOrders}">
+            <div th:if="${type=='recentOrder'}">
+                <h2 >近一个月订单</h2>
+            </div>
+            <div th:if="${type=='allOrder'}">
+                <h2 >全部订单</h2>
+            </div>
+
+            <div>
+                <button class="btn btn-primary btn-lg" id="controlButton1" th:onclick="'javascript:ShowFinishedOrder()'">已完成订单</button>
+            </div>
+
+            <div id="finishedOrder" style="display: block">
+                <table style="width: 100%;table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th><h3>订单号</h3></th>
+                        <th><h3>车牌号</h3></th>
+                        <th><h3>进入时间</h3></th>
+                        <th><h3>离开时间</h3></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="parkingOrder : ${parkingOrders}">
                     <span th:if="${parkingOrder.isOrderState()}">
                     <th scope="row"> <h3 th:text="${parkingOrder.getOrderId()}"></h3></th>
-                    <td><h3 th:text="${parkingOrder.getCarportNum()}"></h3></td>
+                    <td><h3 th:text="${parkingOrder.getLicenseNum()}"></h3></td>
                     <td><h3 th:text="${parkingOrder.getCreateTime()}"></h3></td>
                     <td><h3 th:text="${parkingOrder.getFinishTime()}"></h3></td>
                     </span>
-                </tr>
-                </tbody>
-            </table>
-
-            <div>
-                <button class="btn btn-primary btn-lg" id="controlButton" th:onclick="'javascript:ShowUnfinishedOrder()'">显示未完成订单</button>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div id="UnfinishedOrder" style="display: none">
+            <br/>
+
+            <div>
+                <button class="btn btn-primary btn-lg" id="controlButton2" th:onclick="'javascript:ShowUnfinishedOrder()'">显示未完成订单</button>
+            </div>
+
+            <div id="unfinishedOrder" style="display: none">
                 <table style="width: 100%;table-layout: fixed">
                     <thead>
                     <tr>
@@ -106,7 +129,7 @@
         </div>
 
         <div class="col-md-2">
-            <h3>请看过来！！！</h3>
+            <h3>看这里！！！</h3>
             <p>如有问题，请致电 </p>
             <p>xxx-xxxx-xxxx</p>
             <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
@@ -163,14 +186,25 @@
 
 <script type="text/javascript">
     function ShowUnfinishedOrder() {
-        var div = document.getElementById("UnfinishedOrder").style.display;
+        var div = document.getElementById("unfinishedOrder").style.display;
         if(div=='none'){
-            document.getElementById("UnfinishedOrder").style.display='block';
-            document.getElementById("controlButton").innerText='隐藏未完成订单';
+            document.getElementById("unfinishedOrder").style.display='block';
+            document.getElementById("controlButton2").innerText='未完成订单';
         }
         else {
-            document.getElementById("UnfinishedOrder").style.display='none';
-            document.getElementById("controlButton").innerText='显示未完成订单';
+            document.getElementById("unfinishedOrder").style.display='none';
+            document.getElementById("controlButton2").innerText='显示未完成订单';
+        }
+    }
+    function ShowFinishedOrder() {
+        var div = document.getElementById("finishedOrder").style.display;
+        if(div=='none'){
+            document.getElementById("finishedOrder").style.display='block';
+            document.getElementById("controlButton1").innerText='已完成订单';
+        }
+        else {
+            document.getElementById("finishedOrder").style.display='none';
+            document.getElementById("controlButton1").innerText='显示已完成订单';
         }
     }
     function ModifyUnitPrice() {
@@ -205,6 +239,7 @@
         }
         return xmlhttp;
     }
+
 </script>
 </body>
 </html>

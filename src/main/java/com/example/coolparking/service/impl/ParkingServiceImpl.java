@@ -9,6 +9,8 @@ import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingInfo;
 import com.example.coolparking.dataobject.ParkingOrder;
 import com.example.coolparking.service.ParkingService;
+import com.example.coolparking.utils.OrderUtil;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -71,7 +74,8 @@ public class ParkingServiceImpl implements ParkingService {
 
     @Override
     public List<ParkingOrder> parkingFindAllOrders(int parkingId) {
-        return parkingOrderDao.findAll();
+
+        return OrderUtil.modifyTime(parkingOrderDao.findAll());
     }
 
     @Override
@@ -104,7 +108,16 @@ public class ParkingServiceImpl implements ParkingService {
         List<ParkingCarport> parkingCarportList=parkingCarportDao.parkingFindAllCarports(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable());
         int start=(int)pageable.getOffset();
         int end=(start+pageable.getPageSize())>parkingCarportList.size()?parkingCarportList.size():(start+pageable.getPageSize());
-        Page<ParkingCarport> parkingCarportPage=new PageImpl<ParkingCarport>(parkingCarportList.subList(start,end),pageable,parkingCarportList.size());
+        Page<ParkingCarport> parkingCarportPage=new PageImpl<>(parkingCarportList.subList(start,end),pageable,parkingCarportList.size());
         return parkingCarportPage;
+    }
+
+    @Override
+    public List<ParkingOrder> parkingFindRecentOrders(int parkingId){
+        Calendar now = Calendar.getInstance();
+        String Time=  now.get(Calendar.YEAR)+"-"+now.get(Calendar.MONTH)+"-"+now.get(Calendar.DAY_OF_MONTH);
+        List<ParkingOrder> list=parkingOrderDao.findRecentOrder(parkingId,Time);
+        list = OrderUtil.modifyTime(list);
+        return list;
     }
 }
