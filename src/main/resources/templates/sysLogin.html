@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--    <meta charset="UTF-8">-->
+    <!--    <title>车库管理员登录</title>-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="page-header">系统管理员登录</h1>
+    <form th:action="@{/sservice/smain}" method="post">
+        <div class="row">
+            <div class="form-group col-sm-7">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码">
+            </div></div>
+
+        <div class="row" style="display: inline;white-space: normal" >
+            <input type="submit" class="btn btn-info btn-lg col-sm-3" value="登录" style="border: 15px solid white">
+            <input class="btn btn-danger btn-lg col-sm-3" type="reset" value="重置" style="border: 15px solid white">
+        </div><br>
+    </form>
+</div>
+</body>
+</html>

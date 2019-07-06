@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>系统管理</title>
+</head>
+<body>
+    <div class="container" style="text-align: center">
+
+        <form method="post" th:action="@{/sservice/screate}">
+            <h2 style="font-size: 30px">创建车库</h2>
+            <br><br>
+            <label for="parkingname" >请填写停车场名:</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input name="parkingname" style="color: darkcyan; width: 250px" id="parkingname" placeholder="请填写停车场名" required autofocus>
+            <br><br><br>
+            <label for="tablename" >请填写车库表名:</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input name="tablename" style="color: darkcyan; width: 250px" id="tablename" placeholder="请填写车库表名" required autofocus>
+            <br><br><br>
+            <label for="carportnum">请填写车位数量:</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input name="carportnum" style="width: 250px" type="number" min="1" max="999" id="carportnum" placeholder="请填写车位数量" required>
+            <br><br><br>
+            <button type="submit" style="border-color: mediumaquamarine; font-size: 20px">创建</button>
+        </form>
+
+    </div>
+</body>
+</html>
