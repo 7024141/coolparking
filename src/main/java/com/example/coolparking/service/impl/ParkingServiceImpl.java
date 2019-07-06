@@ -8,6 +8,7 @@ import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingInfo;
 import com.example.coolparking.dataobject.ParkingOrder;
+import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -41,6 +44,18 @@ public class ParkingServiceImpl implements ParkingService {
                 System.out.println("登录成功");
                 ai.setLoginState(true);
                 adminInfoDao.save(ai);
+
+                //写入内容
+                Date date = new Date();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateTime = df.format(date);
+                String content = "<p>"+dateTime + "    管理员"+ai.getParkingId()+ "登陆成功"+"</p>\r\n";
+                //写入文件路径
+                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+                String dateTime2 = df2.format(date);
+                String path = ".\\txtlog\\"+parkingId+"-"+dateTime2+".txt";
+                Log.bwFile( path, content,true);
+
                 return "登录成功";
             }
             else {

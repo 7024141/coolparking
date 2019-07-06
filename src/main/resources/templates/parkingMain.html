@@ -99,11 +99,7 @@
                 </li>
             </ul>
         </div>
-        <div class="col-md-4">
-            <h3>请看过来！！！</h3>
-            <p>如有问题，请致电 </p>
-            <p>xxx-xxxx-xxxx</p>
-            <p><a class="btn btn-default" href="javascript:void(0)" role="button">View details &raquo;</a></p>
+        <div class="col-md-4" id="logdiv">
         </div>
     </div>
     <hr>
@@ -154,7 +150,38 @@
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
+    window.onload = function() {
+        var test = setInterval(GetLogInfo,1000);
+    }
+    function GetLogInfo()
+    {
+        var request=null;
+        if(window.XMLHttpRequest)
+        {
+            request=new XMLHttpRequest();
+        }else if(window.ActiveXObject)
+        {
+            request=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        if(request)
+        {
+            request.open("POST",'/coolparking/pservice/pgetlog',true);
+            request.onreadystatechange=function()
+            {
+                if(request.readyState===4)
+                {
+                    if (request.status == 200 || request.status == 0)
+                    {
+                        document.getElementById("logdiv").innerHTML="<pre>"+request.responseText+"</pre>";
+                    }
+                }
+            }
+            request.send('{parkingId:'+[[${parkingId}]]+'}');
+        }else{
+            alert("error");
+        }
+    }
     function ModifyUnitPrice() {
         let parkingPrice=document.getElementById("parkingPrice").innerText;
         let newPrice=document.getElementById("newPrice").value;
