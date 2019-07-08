@@ -19,4 +19,9 @@ public class AdminInfo {
     public AdminInfo(){
 
     }
+
+    public AdminInfo(int parkingId, String password){
+        this.parkingId = parkingId;
+        this.password = password;
+    }
 }

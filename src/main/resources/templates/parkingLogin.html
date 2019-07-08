@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <h1 class="page-header">车库管理员登录</h1>
-    <form th:action="@{/pservice/pmain}" method="post">
+    <form id="chform" action="/coolparking/check/login" method="post" target="myIframe">
         <div class="row">
             <div class="form-group col-sm-7">
                 <label for="parkingId">车库号</label>
@@ -23,12 +23,77 @@
                 <label for="password">密码</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码">
             </div></div>
+        <div class="row" style="display: none">
+            <div class="form-group col-sm-7">
+                <label for="UUID">UUID</label>
+                <input type="text" class="form-control" id="UUID" name="UUID" th:value="${UUID}">
+            </div></div>
 
         <div class="row" style="display: inline;white-space: normal" >
             <input type="submit" class="btn btn-info btn-lg col-sm-3" value="登录" style="border: 15px solid white">
             <input class="btn btn-danger btn-lg col-sm-3" type="reset" value="重置" style="border: 15px solid white">
         </div><br>
     </form>
+    <iframe id="myIframe" name="myIframe" style="display: none"></iframe>
 </div>
 </body>
+
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script>
+    var websocket = null;
+    if('WebSocket' in window) {
+        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
+        websocket = new WebSocket(path);
+    }else {
+        alert('该浏览器不支持websocket!');
+    }
+
+    websocket.onopen = function (event) {
+        console.log('建立连接');
+    }
+
+    websocket.onclose = function (event) {
+        console.log('连接关闭');
+    }
+
+    websocket.onmessage = function (event) {
+        var res = event.data;
+        alert(res);
+        if(res == "登录成功"){
+            var path = "/coolparking/pservice/pmain?parkingId="+$("#parkingId").val();
+            console.log(path);
+            location.href = path;
+        }
+    }
+
+    websocket.onerror = function () {
+        alert('websocket通信发生错误！');
+    }
+
+    window.onbeforeunload = function () {
+        websocket.close();
+    }
+</script>
+
+<!--<script>-->
+<!--    function sub(){-->
+<!--        $.ajax({-->
+<!--            url: "/coolparking/check/login",-->
+<!--            type: "POST",-->
+<!--            dataType:"JSON",-->
+<!--            data: $("#chform").serialize(),-->
+<!--            async:false,-->
+<!--            success: function (result) {-->
+<!--                console.log(result);-->
+<!--                if (result.code == 0){-->
+<!--                    if(result.msg == "")-->
+
+<!--                }-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+
 </html>

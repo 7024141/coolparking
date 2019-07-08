@@ -40,10 +40,10 @@ public class ParkingServiceImpl implements ParkingService {
     ParkingCarportDao parkingCarportDao;
 
     @Override
-    public String parkingMain(int parkingId, String password) {
-        AdminInfo ai=adminInfoDao.findById(parkingId).orElse(null);
+    public String parkingMain(AdminInfo adminInfo) {
+        AdminInfo ai=adminInfoDao.findById(adminInfo.getParkingId()).orElse(null);
         if(ai!=null){
-            if(ai.getPassword().equals(password)){
+            if(ai.getPassword().equals(adminInfo.getPassword())){
                 System.out.println("登录成功");
                 ai.setLoginState(true);
                 adminInfoDao.save(ai);
@@ -56,7 +56,7 @@ public class ParkingServiceImpl implements ParkingService {
                 //写入文件路径
                 SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
                 String dateTime2 = df2.format(date);
-                String path = ".\\txtlog\\"+parkingId+"-"+dateTime2+".txt";
+                String path = ".\\txtlog\\"+ai.getParkingId()+"-"+dateTime2+".txt";
                 Log.bwFile( path, content,true);
 
                 return "登录成功";

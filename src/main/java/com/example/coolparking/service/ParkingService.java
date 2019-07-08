@@ -1,5 +1,6 @@
 package com.example.coolparking.service;
 
+import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
 import org.springframework.data.domain.Page;
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ParkingService {
-    String parkingMain(int parkingId,String password);
+    String parkingMain(AdminInfo adminInfo);
 
     List<ParkingCarport> parkingFindAllCarports(int parkingId);
 
