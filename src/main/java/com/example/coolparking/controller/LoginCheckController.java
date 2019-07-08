@@ -1,6 +1,7 @@
 package com.example.coolparking.controller;
 
 import com.example.coolparking.VO.AdminInfoTrans;
+import com.example.coolparking.aspect.AuthorizeAspect;
 import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.UserToken;
 import com.example.coolparking.service.ParkingService;
@@ -9,6 +10,7 @@ import com.example.coolparking.service.WebSocket;
 import com.example.coolparking.utils.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -35,6 +37,7 @@ public class LoginCheckController {
         String result = parkingService.parkingMain(adminInfo);
         webSocket.sendInfo(adminInfoTrans.getUUID(), result);
         if(result.equals("登录成功")){
+            AuthorizeAspect.token = String.valueOf(adminInfoTrans.getParkingId());
             //2、创建UUID与value
             UserToken userToken = new UserToken(adminInfoTrans.getUUID(), String.valueOf( adminInfoTrans.getParkingId()));
             userToken.setLoginTime(new Date());
@@ -60,5 +63,13 @@ public class LoginCheckController {
             CookieUtil.set(response, String.valueOf(parkingId), null, 0);
         }
         return "redirect:/pservice/plogin";
+    }
+
+    @GetMapping("/qrlogin")
+    public void qrlogin(@RequestParam("openId")String openId, @RequestParam("UUID")String UUID){
+        if(!StringUtils.isEmpty(UUID)){
+            UserToken userToken = userTokenService.findOne(UUID);
+
+        }
     }
 }

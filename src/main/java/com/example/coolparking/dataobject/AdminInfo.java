@@ -15,7 +15,7 @@ public class AdminInfo {
     @GeneratedValue
     private int parkingId;
     private String password;
-    private boolean loginState;
+    private String openId;
     public AdminInfo(){
 
     }

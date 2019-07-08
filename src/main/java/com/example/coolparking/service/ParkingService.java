@@ -20,7 +20,7 @@ public interface ParkingService {
 
     List<ParkingOrder> parkingFindAllOrders(int parkingId);
 
-    boolean parkingLoginState(int parkingId);
+    //boolean parkingLoginState(int parkingId);
 
     BigDecimal parkingGetPrice(int parkingId);
 

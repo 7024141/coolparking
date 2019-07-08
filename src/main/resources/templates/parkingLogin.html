@@ -34,6 +34,9 @@
             <input class="btn btn-danger btn-lg col-sm-3" type="reset" value="重置" style="border: 15px solid white">
         </div><br>
     </form>
+    <div class="span12">
+        <img class="img-polaroid" th:src="'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+${UUID}" />
+    </div>
     <iframe id="myIframe" name="myIframe" style="display: none"></iframe>
 </div>
 </body>

@@ -45,7 +45,7 @@ public class ParkingServiceImpl implements ParkingService {
         if(ai!=null){
             if(ai.getPassword().equals(adminInfo.getPassword())){
                 System.out.println("登录成功");
-                ai.setLoginState(true);
+                //ai.setLoginState(true);
                 adminInfoDao.save(ai);
 
                 //写入内容
@@ -93,10 +93,10 @@ public class ParkingServiceImpl implements ParkingService {
         return OrderUtil.modifyTime(parkingOrderDao.findAll());
     }
 
-    @Override
-    public boolean parkingLoginState(int parkingId){
-        return adminInfoDao.findById(parkingId).orElse(null).isLoginState();
-    }
+//    @Override
+//    public boolean parkingLoginState(int parkingId){
+//        return adminInfoDao.findById(parkingId).orElse(null).isLoginState();
+//    }
 
     @Override
     public BigDecimal parkingGetPrice(int parkingId){
