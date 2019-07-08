@@ -5,6 +5,7 @@ import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
 import com.example.coolparking.service.WebSocket;
+import com.example.coolparking.utils.CookieUtil;
 import com.example.coolparking.utils.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.jws.WebParam;
 import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,6 +31,9 @@ public class ParkingController {
     @Autowired
     private ParkingService parkingService;
 
+    @Autowired
+    WebSocket webSocket;
+
     @RequestMapping("/plogin")
     public String parkingToLogin(Model model){
         String UUID = UUIDUtil.createUUID();
@@ -37,11 +42,16 @@ public class ParkingController {
     }
 
     @RequestMapping("/pmain")
-    public String parkingMain(Model model, @RequestParam("parkingId")int parkingId,
+    public String parkingMain(Model model, HttpServletRequest request,
+                              @RequestParam("parkingId")int parkingId,
                               @RequestParam(value = "page",defaultValue = "0")int page,
                               @RequestParam(value = "size",defaultValue = "4")int size){
         PageRequest pageRequest=PageRequest.of(page,size);
         Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,parkingId);
+        Cookie cookie = CookieUtil.get(request, String.valueOf(parkingId));
+        if(cookie != null){
+            model.addAttribute("UUID", cookie.getValue());
+        }
         //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
         model.addAttribute("parkingId", parkingId);
         model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));

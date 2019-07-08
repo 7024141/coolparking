@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorizeAspect {
 
-    @Pointcut("execution(public * com.example.coolparking.controller.ParkingController.)")
+    @Pointcut("execution(public * com.example.coolparking.controller.ParkingController.*(..))"+
+            "&& !execution(public * com.example.coolparking.controller.ParkingController.parkingToLogin())")
     public void verify(){}
 
     public void doVerify(){

@@ -149,7 +149,6 @@
 <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 <script type="text/javascript" th:inline="javascript">
     window.onload = function() {
         var test = setInterval(GetLogInfo,1000);
@@ -213,6 +212,38 @@
             xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
         }
         return xmlhttp;
+    }
+</script>
+
+<script>
+    var websocket = null;
+    if('WebSocket' in window) {
+        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
+        websocket = new WebSocket(path);
+    }else {
+        alert('该浏览器不支持websocket!');
+    }
+
+    websocket.onopen = function (event) {
+        console.log('建立连接');
+    }
+
+    websocket.onclose = function (event) {
+        console.log('连接关闭');
+    }
+
+    websocket.onmessage = function (event) {
+        var res = event.data;
+        alert(res);
+
+    }
+
+    websocket.onerror = function () {
+        alert('websocket通信发生错误！');
+    }
+
+    window.onbeforeunload = function () {
+        websocket.close();
     }
 </script>
 </body>
