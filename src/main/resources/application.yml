@@ -13,7 +13,7 @@ spring:
       prefix: /WEB-INF/
       suffix: .jsp
 
+
 server:
-  context-path: /coolparking
-
-
+  servlet:
+    context-path: /coolparking

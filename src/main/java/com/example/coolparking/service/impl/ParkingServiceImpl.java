@@ -34,10 +34,10 @@ public class ParkingServiceImpl implements ParkingService {
     ParkingCarportDao parkingCarportDao;
 
     @Override
-    public String parkingMain(int parkingId, String password) {
-        AdminInfo ai=adminInfoDao.findById(parkingId).orElse(null);
+    public String parkingMain(AdminInfo adminInfo) {
+        AdminInfo ai=adminInfoDao.findById(adminInfo.getParkingId()).orElse(null);
         if(ai!=null){
-            if(ai.getPassword().equals(password)){
+            if(ai.getPassword().equals(adminInfo.getPassword())){
                 System.out.println("登录成功");
                 ai.setLoginState(true);
                 adminInfoDao.save(ai);

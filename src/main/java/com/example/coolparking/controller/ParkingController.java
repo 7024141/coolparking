@@ -3,6 +3,8 @@ package com.example.coolparking.controller;
 import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.service.ParkingService;
+import com.example.coolparking.service.WebSocket;
+import com.example.coolparking.utils.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.WebParam;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,51 +27,25 @@ public class ParkingController {
     private ParkingService parkingService;
 
     @RequestMapping("/plogin")
-    public String parkingToLogin(){
+    public String parkingToLogin(Model model){
+        String UUID = UUIDUtil.createUUID();
+        model.addAttribute("UUID", UUID);
         return "parkingLogin";
     }
 
     @RequestMapping("/pmain")
-    public String parkingMain(Model model,AdminInfo adminInfo,@RequestParam(value = "page",defaultValue = "0")int page,@RequestParam(value = "size",defaultValue = "4")int size){
-        if(parkingService.parkingLoginState(adminInfo.getParkingId())&&adminInfo.getPassword()==null){
-            PageRequest pageRequest=PageRequest.of(page,size);
-            Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,adminInfo.getParkingId());
-            //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
-            model.addAttribute("parkingId", adminInfo.getParkingId());
-            model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
-            model.addAttribute("parkingPrice", parkingService.parkingGetPrice(adminInfo.getParkingId()).toString());
-            model.addAttribute("parkingCarportPage",parkingCarportPage);
-            model.addAttribute("currentPage",page);
-            return "parkingMain";
-        }
-        else {
-//            if(parkingService.parkingLoginState(adminInfo.getParkingId())){
-//                //禁止登录
-//                System.out.println("禁止登录");
-//                return "parkingLogin";
-//            }
-            String str = parkingService.parkingMain(adminInfo.getParkingId(),adminInfo.getPassword());
-            if(str.equals("密码错误")){
-                //弹窗
-                return "redirect:/pservice/plogin";
-            }
-            else if(str.equals("用户不存在")){
-                //弹窗
-                return "redirect:/pservice/plogin";
-            }
-            else if(str.equals("登录成功")){
-                PageRequest pageRequest=PageRequest.of(page,size);
-                Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,adminInfo.getParkingId());
-                //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
-                model.addAttribute("parkingId", adminInfo.getParkingId());
-                model.addAttribute("parkingName", parkingService.parkingFindName(adminInfo.getParkingId()));
-                model.addAttribute("parkingPrice", parkingService.parkingGetPrice(adminInfo.getParkingId()).toString());
-                model.addAttribute("parkingCarportPage",parkingCarportPage);
-                model.addAttribute("currentPage",page);
-                return "parkingMain";
-            }
-            return "redirect:/pservice/plogin";
-        }
+    public String parkingMain(Model model, @RequestParam("parkingId")int parkingId,
+                              @RequestParam(value = "page",defaultValue = "0")int page,
+                              @RequestParam(value = "size",defaultValue = "4")int size){
+        PageRequest pageRequest=PageRequest.of(page,size);
+        Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,parkingId);
+        //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
+        model.addAttribute("parkingId", parkingId);
+        model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
+        model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
+        model.addAttribute("parkingCarportPage",parkingCarportPage);
+        model.addAttribute("currentPage",page);
+        return "parkingMain";
     }
 
     @RequestMapping("/pedit")
