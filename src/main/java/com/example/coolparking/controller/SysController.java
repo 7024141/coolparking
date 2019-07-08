@@ -1,6 +1,7 @@
 package com.example.coolparking.controller;
 
 import com.example.coolparking.dataobject.ParkingInfo;
+import com.example.coolparking.dataobject.SystemInfo;
 import com.example.coolparking.service.CreateParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -28,15 +29,20 @@ public class SysController {
     @RequestMapping("/smain")
     public String sysMain(String password){
         if(password!=null){
-            if(password.equals("coolparking")){
+
+            if(createParkingService.findSystemAdmin(password)){
                 return "sysManage";
             }
+            else {
+                return "redirect:/sservice/slogin";
+            }
+
         }
         else {
             return "sysManage";
         }
 
-        return "redirect:/sservice/slogin";
+
     }
 
     @RequestMapping("/screate")
