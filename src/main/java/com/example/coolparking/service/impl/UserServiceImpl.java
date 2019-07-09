@@ -1,11 +1,9 @@
 package com.example.coolparking.service.impl;
 
-import com.example.coolparking.dao.ParkingCarportDao;
-import com.example.coolparking.dao.ParkingInfoDao;
-import com.example.coolparking.dao.ParkingOrderDao;
-import com.example.coolparking.dao.UserTokenRepository;
+import com.example.coolparking.dao.*;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
+import com.example.coolparking.dataobject.UserInfo;
 import com.example.coolparking.dataobject.UserToken;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.UserService;
@@ -26,6 +24,8 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
+    UserInfoDao userInfoDao;
+    @Autowired
     ParkingOrderDao parkingOrderDao;
     @Autowired
     ParkingCarportDao parkingCarportDao;
@@ -37,9 +37,19 @@ public class UserServiceImpl implements UserService {
     WebSocket webSocket;
 
     @Override
+    public void login(String openId){
+        System.out.println("6666"+openId);
+        UserInfo u=new UserInfo();
+        u.setOpenId(openId);
+        userInfoDao.save(u);
+    }
+
+    @Override
     public List<ParkingOrder> findOrderById(String openId) {
         List<ParkingOrder> list = parkingOrderDao.findOrderById(openId);
-        list =OrderUtil.modifyTime(list);
+        if(list!=null){
+            list =OrderUtil.modifyTime(list);
+        }
         return list;
     }
 

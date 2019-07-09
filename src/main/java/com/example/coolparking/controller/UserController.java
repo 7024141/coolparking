@@ -1,6 +1,7 @@
 package com.example.coolparking.controller;
 
 import com.example.coolparking.dataobject.ParkingOrder;
+import com.example.coolparking.dataobject.UserInfo;
 import com.example.coolparking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,15 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserService userService;
+
+
+    @RequestMapping("ulogin")
+    @ResponseBody
+    public String userLogin(String openId){
+        userService.login(openId);
+        return "success";
+    }
+
     @RequestMapping("ucheckorder")
     @ResponseBody
     public Map findOrderById(String openId){

@@ -53,7 +53,6 @@
         }
         else {
             enPwd.value = hex_md5(enPwd.value);
-            alert(enPwd.value);
             return true;
         }
     }
@@ -61,7 +60,7 @@
 <script>
     var websocket = null;
     if('WebSocket' in window) {
-        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
+        var path = "wss://personalstudy.mynatapp.cc/coolparking/webSocket/" + [[${UUID}]];
         websocket = new WebSocket(path);
     }else {
         alert('该浏览器不支持websocket!');
