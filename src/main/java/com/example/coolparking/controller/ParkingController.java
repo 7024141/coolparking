@@ -2,6 +2,7 @@ package com.example.coolparking.controller;
 
 import com.example.coolparking.VO.ResponseOb;
 import com.example.coolparking.dataobject.ParkingCarport;
+import com.example.coolparking.dataobject.ParkingOrder;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
 import com.example.coolparking.service.WebSocket;
@@ -21,8 +22,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 @Controller
 @RequestMapping("/pservice")
@@ -154,5 +160,100 @@ public class ParkingController {
 
         response.setCharacterEncoding("utf-8");
         response.getWriter().print(log);
+    }
+
+    @RequestMapping("/preport")
+    public String pReport(Model model,@RequestParam("parkingId")int parkingId){
+        //获取今天的日期
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String dateTime = df.format(date);
+        //获取明天的日期
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        calendar.add(calendar.DATE,1);
+        String nextTime= df.format(calendar.getTime());
+        //获取昨日的日期
+        calendar.add(calendar.DATE,-2);
+        String time1= df.format(calendar.getTime());
+        //
+        calendar.add(calendar.DATE,-1);
+        String time2= df.format(calendar.getTime());
+        //
+        calendar.add(calendar.DATE,-1);
+        String time3= df.format(calendar.getTime());
+        //
+        calendar.add(calendar.DATE,-1);
+        String time4= df.format(calendar.getTime());
+
+        //计算今日总的营业额和出库车辆
+        int totalToday = getDayPrice(parkingId,dateTime,nextTime);
+        int todayCar = getDayNum(parkingId,dateTime,nextTime);
+        //昨日
+        int totalYe = getDayPrice(parkingId,time1,dateTime);
+        int YeCar = getDayNum(parkingId,time1,dateTime);
+        //
+        int total2 = getDayPrice(parkingId,time2,time1);
+        //
+        int total3 = getDayPrice(parkingId,time3,time2);
+        //
+        int total4 = getDayPrice(parkingId,time4,time3);
+
+        model.addAttribute("parkingId",parkingId);
+        model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
+        model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
+        //今天
+        model.addAttribute("totalPrice",totalToday);
+        model.addAttribute("totalCarNum",todayCar);
+        model.addAttribute("time",dateTime);
+        //昨天
+        model.addAttribute("totalYePrice",totalYe);
+        model.addAttribute("YeCarNum",YeCar);
+        model.addAttribute("time1",time1);
+        //
+        model.addAttribute("time2",time2);
+        model.addAttribute("time3",time3);
+        model.addAttribute("time4",time4);
+        model.addAttribute("price2",total2);
+        model.addAttribute("price3",total3);
+        model.addAttribute("price4",total4);
+
+        return "parkingReport";
+    }
+
+    public int getDayNum(int parkingId, String date1, String date2){
+        List<ParkingOrder> l = parkingService.findAllOder(parkingId,1, date1, date2); //获取所有账单
+        return l.size();
+    }
+
+    public int getDayPrice(int parkingId, String date1, String date2){
+        List<ParkingOrder> l = parkingService.findAllOder(parkingId,1, date1, date2); //获取所有账单
+        float price = parkingService.parkingGetPrice(parkingId).floatValue(); //获取单价
+        int length = l.size(); //订单数目
+        int total = 0; //总营业额
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for(int i=0;i<length;i++){
+            ParkingOrder o = l.get(i);
+            String start = o.getCreateTime();
+            String end = o.getFinishTime();
+            Date d1 = null;
+            try {
+                d1 = df.parse(start);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Date d2 = null;
+            try {
+                d2 = df.parse(end);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            long diff = d2.getTime() - d1.getTime();
+            long minute = diff/60/1000;
+            int money = (int)(minute * price);
+            System.out.println(money);
+            total = total + money;
+        }
+        return total;
     }
 }

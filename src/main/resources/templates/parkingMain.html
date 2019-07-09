@@ -103,10 +103,19 @@
 <!--            </ul>-->
             <div id="pagination" class="pagination"></div>
         </div>
-
+        <!--startprint-->
         <div class="col-md-4" id="logdiv">
         </div>
+        <!--endprint-->
     </div>
+
+    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Print()">
+        打印日志
+    </button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Check()">
+        查看报表
+    </button>
+
     <hr>
     <footer>
         <p>&copy; 2019 university, Inc.</p>
@@ -242,6 +251,22 @@
             xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
         }
         return xmlhttp;
+    }
+
+    function Print(){
+        bdhtml=window.document.body.innerHTML;
+        sprnstr="<!--startprint-->";
+        eprnstr="<!--endprint-->";
+        prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);
+        prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+    }
+
+    function Check(){
+        var w=screen.availWidth;
+        var h=screen.availHeight;
+        window.open('preport?parkingId='+[[${parkingId}]]+'','','width='+w+',height='+h+',top=0,left=0,toolbar=no,menubar=no,location=no,,status=yes');
     }
 </script>
 

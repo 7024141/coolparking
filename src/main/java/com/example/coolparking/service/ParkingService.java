@@ -29,4 +29,6 @@ public interface ParkingService {
     Page<ParkingCarport> findAll(Pageable pageable,int parkingId);
 
     List<ParkingOrder> parkingFindRecentOrders(int parkingId);
+
+    List<ParkingOrder> findAllOder(int parkingId,int state, String start, String end);
 }
