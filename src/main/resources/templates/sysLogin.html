@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <h1 class="page-header">系统管理员登录</h1>
-    <form th:action="@{/sservice/smain}" method="post">
+    <form th:action="@{/sservice/smain}" method="post" onsubmit="return encryption()">
         <div class="row">
             <div class="form-group col-sm-7">
                 <label for="password">密码</label>
@@ -26,4 +26,16 @@
     </form>
 </div>
 </body>
+<script>
+    function encryption() {
+        var enPwd = $("password");
+        if(enPwd!=null){
+            alert("请输入密码");
+            return false;
+        }
+        else {
+            enPwd.value
+        }
+    }
+</script>
 </html>

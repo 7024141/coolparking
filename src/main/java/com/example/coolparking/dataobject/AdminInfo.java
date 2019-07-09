@@ -12,10 +12,9 @@ import javax.persistence.Table;
 @Table(name = "admin_info")
 public class AdminInfo {
     @Id
-    @GeneratedValue
     private int parkingId;
     private String password;
-    private boolean loginState;
+    private String openId;
     public AdminInfo(){
 
     }
