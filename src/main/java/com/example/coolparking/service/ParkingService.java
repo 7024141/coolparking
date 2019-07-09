@@ -12,15 +12,11 @@ import java.util.List;
 public interface ParkingService {
     String parkingMain(AdminInfo adminInfo);
 
-    List<ParkingCarport> parkingFindAllCarports(int parkingId);
-
     String parkingFindName(int parkingId);
 
     boolean parkingCarportEdit(int parkingId,String parkingCarportNum,boolean ableState);
 
     List<ParkingOrder> parkingFindAllOrders(int parkingId);
-
-    //boolean parkingLoginState(int parkingId);
 
     BigDecimal parkingGetPrice(int parkingId);
 

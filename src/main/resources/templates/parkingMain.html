@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,11 +12,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Page -->
-    <link rel="stylesheet" href="/coolparking/css/myPagination.css">
 
-    <!-- Custom styles for this templates -->
-    <link href="jumbotron.css" rel="stylesheet">
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -25,102 +22,30 @@
     <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
     <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <![endif]-->
-    <script src="/coolparking/js/myPagination.js"></script>
 </head>
-
-<body>
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
+<body style="overflow: hidden">
+<div>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
+                    <li><a id="toCarport" href="javascript:changeToCarport()">车位</a></li>
+                    <li><a id="toOrder"  href="javascript:changeToOrder()">订单</a></li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                </ul>
+                <form class="navbar-form navbar-right">
+                    <input type="text" class="form-control" placeholder="Search...">
+                </form>
+            </div>
         </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
-                <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
-                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type='recentOrder')}" >订单</a></li>
-                <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
-            </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
-        </div>
-    </div>
-</nav>
-
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <div class="container">
-        <br/><br/>
-        <h2 th:text="${'No.'+parkingId}"></h2>
-        <p th:text="${'这里是'+parkingName}"></p>
-        <p><a class="btn btn-primary btn-lg" href="javascript:void(0)" role="button">了解更多&raquo;</a></p>
-    </div>
+    </nav>
 </div>
-
-<div class="container">
-    <!-- Example row of columns -->
-    <div class="row">
-        <div class="col-md-7" >
-            <h2>车位信息</h2>
-            <table th:fragment="carportInfo" class="tab">
-                <thead>
-                <th><h3>车位号</h3></th>
-                <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                <th><h3>有车/无车</h3></th>
-                <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                <th><h3>禁用/启用</h3></th>
-                </thead>
-                <tbody align="center">
-                <tr th:each="parkingCarport : ${parkingCarportPage}">
-                    <th scope="row"> <h3 th:text="${parkingCarport.getCarportNum()}"></h3></th>
-                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <td ><h3 th:text="${parkingCarport.isCarState()?'有车':'无车'}"></h3> </td>
-                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <td ><h3><a th:href="@{/pservice/pedit(parkingId=${parkingId},page=${currentPage},parkingCarportNum=${parkingCarport.getCarportNum()},ableState=${parkingCarport.isAbleState()})}" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
-                </tr>
-                </tbody>
-            </table>
-
-<!--            <ul class="pagination right">-->
-<!--                <li th:class="${currentPage<1?'disabled':''}">-->
-<!--                    <a th:if="${currentPage < 1}" href="javascript:void(0)">上一页</a>-->
-<!--                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>-->
-<!--                </li>-->
-<!--                <li th:each="number:${#numbers.sequence(0,parkingCarportPage.totalPages - 1)}" th:class="${currentPage==number?'active':''}" >-->
-<!--                    <a th:if="${currentPage==number}" href="javascript:void(0)">-->
-<!--                        <span th:text="${number+1}"></span>-->
-<!--                    </a>-->
-<!--                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${number})}">-->
-<!--                        <span th:text="${number+1}"></span>-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--                <li th:class="${currentPage+1 >= parkingCarportPage.totalPages?'disabled':''}">-->
-<!--                    <a th:if="${currentPage+1 >= parkingCarportPage.totalPages}" href="javascript:void(0)">下一页</a>-->
-<!--                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>-->
-<!--                </li>-->
-<!--            </ul>-->
-            <div id="pagination" class="pagination"></div>
-        </div>
-        <!--startprint-->
-        <div class="col-md-4" id="logdiv">
-        </div>
-        <!--endprint-->
-    </div>
-
-    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Print()">
-        打印日志
-    </button>
-    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Check()">
-        查看报表
-    </button>
-
-    <hr>
-    <footer>
-        <p>&copy; 2019 university, Inc.</p>
-    </footer>
-</div> <!-- /container -->
+<iframe id="myFrame" th:src="'/coolparking/pservice/pcarport?parkingId='+${parkingId}+'&page='+${currentPage}" th:fragment="myFrame" style="width: 100%;" onload="fitFrameHeight()" frameborder="0" >
+</iframe>
 
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
@@ -137,7 +62,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}+' 元/小时'"></p>
+                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
                 <p>您希望的价格是：</p>
                 <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
             </div>
@@ -153,77 +78,28 @@
     </div><!-- /.modal -->
 </div>
 
-<p id="parkingId" th:text="${parkingId}" style="display: none"></p>
-<p id="parkingPrice" th:text="${parkingPrice}" style="display:none"></p>
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-
-<script>
-    new Page({
-        id: 'pagination',
-        pageTotal: [[${parkingCarportPage.totalPages}]], //总页数
-        pageAmount: [[${size}]],  //每页多少条
-        dataTotal: [[${parkingCarportPage.getTotalElements()}]], //总共多少条数据
-        curPage:[[${currentPage}]], //初始页码,不填默认为1
-        pageSize: 5, //分页个数,不填默认为5
-        showPageTotalFlag:false, //是否显示数据统计,不填默认不显示
-        showSkipInputFlag:true, //是否支持跳转,不填默认不显示
-        getPage: function (page) {
-            //获取当前页数
-            var url = "/coolparking/pservice/update?parkingId="+[[${parkingId}]]+"&page="+(page-1);
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function (data) {
-                    $(".tab").html(data);
-                }
-            })
-        }
-    })
+<script type="text/javascript">
+    function fitFrameHeight() {
+        var myFrame=document.getElementById("myFrame");
+        myFrame.height=document.documentElement.clientHeight;
+    }
+    window.onresize=function () {
+        fitFrameHeight();
+    }
+    function changeToCarport() {
+        var myFrame=document.getElementById("myFrame");
+        myFrame.src='/coolparking/pservice/pcarport?parkingId='+[[${parkingId}]]+'&page='+[[${currentPage}]];
+    }
+    function changeToOrder() {
+        var myFrame=document.getElementById("myFrame");
+        myFrame.src='/coolparking/pservice/porder?parkingId='+[[${parkingId}]]+'&page='+[[${currentPage}]]+'&type=recentOrder';
+    }
 </script>
-
-<script type="text/javascript" th:inline="javascript">
-    window.onload = function() {
-        var test = setInterval(GetLogInfo,1000);
-    }
-    function GetLogInfo()
-    {
-        var request=null;
-        if(window.XMLHttpRequest)
-        {
-            request=new XMLHttpRequest();
-        }else if(window.ActiveXObject)
-        {
-            request=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        if(request)
-        {
-            request.open("POST",'/coolparking/pservice/pgetlog',true);
-            request.onreadystatechange=function()
-            {
-                if(request.readyState===4)
-                {
-                    if (request.status == 200 || request.status == 0)
-                    {
-                        document.getElementById("logdiv").innerHTML="<pre>"+request.responseText+"</pre>";
-                    }
-                }
-            }
-            request.send('{parkingId:'+[[${parkingId}]]+'}');
-        }else{
-            alert("error");
-        }
-    }
+<script>
     function ModifyUnitPrice() {
-        let parkingPrice=document.getElementById("parkingPrice").innerText;
+        let parkingPrice=[[${parkingPrice}]];
         let newPrice=document.getElementById("newPrice").value;
-        let parkingId=document.getElementById("parkingId").innerText;
+        let parkingId=[[${parkingId}]];
         if(newPrice!=parkingPrice&&newPrice!=null){
             let ajax = GetXmlHttpObject();
             let randomNum=new Date().getTime();
@@ -252,53 +128,36 @@
         }
         return xmlhttp;
     }
-
-    function Print(){
-        bdhtml=window.document.body.innerHTML;
-        sprnstr="<!--startprint-->";
-        eprnstr="<!--endprint-->";
-        prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);
-        prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));
-        window.document.body.innerHTML=prnhtml;
-        window.print();
-    }
-
-    function Check(){
-        var w=screen.availWidth;
-        var h=screen.availHeight;
-        window.open('preport?parkingId='+[[${parkingId}]]+'','','width='+w+',height='+h+',top=0,left=0,toolbar=no,menubar=no,location=no,,status=yes');
-    }
 </script>
-
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
-    var websocket = null;
-    if('WebSocket' in window) {
-        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
-        websocket = new WebSocket(path);
-    }else {
-        alert('该浏览器不支持websocket!');
-    }
-
-    websocket.onopen = function (event) {
-        console.log('建立连接');
-    }
-
-    websocket.onclose = function (event) {
-        console.log('连接关闭');
-    }
-
-    websocket.onmessage = function (event) {
-        var res = event.data;
-        alert(res);
-
-    }
-
-    websocket.onerror = function () {
-        alert('websocket通信发生错误！');
-    }
-
-    window.onbeforeunload = function () {
-        websocket.close();
+    window.onbeforeunload=function () {
+        var request=null;
+        if(window.XMLHttpRequest)
+        {
+            request=new XMLHttpRequest();
+        }else if(window.ActiveXObject)
+        {
+            request=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        if(request)
+        {
+            request.open("Get",'/coolparking/check/logout?parkingId='+[[${parkingId}]],false);
+            request.onreadystatechange=function()
+            {
+                if(request.readyState===4)
+                {
+                    if (request.status == 200 || request.status == 0)
+                    {
+                        //成功
+                    }
+                }
+            }
+            request.send();
+        }else{
+            alert("error");
+        }
     }
 </script>
 </body>

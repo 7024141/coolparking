@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -46,8 +45,6 @@ public class ParkingServiceImpl implements ParkingService {
         if(ai!=null){
             if(ai.getPassword().equals(adminInfo.getPassword())){
                 System.out.println("登录成功");
-                //ai.setLoginState(true);
-                adminInfoDao.save(ai);
 
                 //写入内容
                 Date date = new Date();
@@ -73,10 +70,6 @@ public class ParkingServiceImpl implements ParkingService {
         }
     }
 
-    @Override
-    public List<ParkingCarport> parkingFindAllCarports(int parkingId) {
-        return parkingCarportDao.parkingFindAllCarports(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable());
-    }
 
     @Override
     public String parkingFindName(int parkingId) {
@@ -94,10 +87,6 @@ public class ParkingServiceImpl implements ParkingService {
         return OrderUtil.modifyTime(parkingOrderDao.findAll());
     }
 
-//    @Override
-//    public boolean parkingLoginState(int parkingId){
-//        return adminInfoDao.findById(parkingId).orElse(null).isLoginState();
-//    }
 
     @Override
     public BigDecimal parkingGetPrice(int parkingId){

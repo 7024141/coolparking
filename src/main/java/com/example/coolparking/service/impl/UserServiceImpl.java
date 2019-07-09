@@ -3,12 +3,16 @@ package com.example.coolparking.service.impl;
 import com.example.coolparking.dao.ParkingCarportDao;
 import com.example.coolparking.dao.ParkingInfoDao;
 import com.example.coolparking.dao.ParkingOrderDao;
+import com.example.coolparking.dao.UserTokenRepository;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
+import com.example.coolparking.dataobject.UserToken;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.UserService;
+import com.example.coolparking.service.WebSocket;
 import com.example.coolparking.utils.OrderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,6 +31,11 @@ public class UserServiceImpl implements UserService {
     ParkingCarportDao parkingCarportDao;
     @Autowired
     ParkingInfoDao parkingInfoDao;
+    @Autowired
+    UserTokenRepository userTokenRepository;
+    @Autowired
+    WebSocket webSocket;
+
     @Override
     public List<ParkingOrder> findOrderById(String openId) {
         List<ParkingOrder> list = parkingOrderDao.findOrderById(openId);
@@ -35,12 +44,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createOrder(int parkingId,String carNum) {
+    public String createOrder(int parkingId,String carNum) {
         String tableName=parkingInfoDao.findById(parkingId).orElse(null).getCarportTable();
-        ParkingCarport pc=parkingCarportDao.parkingFindFreeCarports(tableName).get(0);
+        List<ParkingCarport> psc=parkingCarportDao.parkingFindFreeCarports(tableName);
+        if(psc==null){
+            return "车位满了";
+        }
+        ParkingCarport pc=psc.get(0);
         ParkingOrder p = OrderUtil.orderCreate(parkingId, carNum, pc.getCarportNum());
         parkingOrderDao.createOrder(p.getOrderId(), p.getLicenseNum(), p.getParkingId(), p.getCarportNum());
         parkingCarportDao.parkingCarportUseEdit(tableName,pc.getCarportNum(),pc.isCarState());
+
+        List<UserToken> userTokens=userTokenRepository.findByValueAndState(String.valueOf(parkingId));
+        Map<String,Object> map=new HashMap<>();
+        map.put("carportNum",pc.getCarportNum());
+        map.put("licenseNum",carNum);
+        map.put("io","in");
+        if(userTokens!=null){
+            for(UserToken userToken:userTokens){
+                webSocket.sendInfo(userToken.getUuid(), new JSONObject(map).toString());
+            }
+        }
 
         //写入内容
         Date date = new Date();
@@ -52,6 +76,8 @@ public class UserServiceImpl implements UserService {
         String dateTime2 = df2.format(date);
         String path = ".\\txtlog\\"+p.getParkingId()+"-"+dateTime2+".txt";
         Log.bwFile( path, content,true);
+
+        return pc.getCarportNum();
     }
 
     @Override
@@ -90,6 +116,17 @@ public class UserServiceImpl implements UserService {
             parkingOrder.setOrderState(true);
             parkingOrderDao.save(parkingOrder);
             parkingCarportDao.parkingCarportUseEdit(parkingInfoDao.findById(parkingId).orElse(null).getCarportTable(),parkingOrder.getCarportNum(),true);
+
+            List<UserToken> userTokens=userTokenRepository.findByValueAndState(String.valueOf(parkingId));
+            Map<String,Object> map=new HashMap<>();
+            map.put("carportNum",parkingOrder.getCarportNum());
+            map.put("licenseNum",parkingOrder.getLicenseNum());
+            map.put("io","out");
+            if(userTokens!=null){
+                for(UserToken userToken:userTokens){
+                    webSocket.sendInfo(userToken.getUuid(), new JSONObject(map).toString());
+                }
+            }
 
             //写入内容
             Date date = new Date();

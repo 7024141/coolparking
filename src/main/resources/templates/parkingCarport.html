@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>车库管理员主界面</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/coolparking/css/myPagination.css">
+    <link href="jumbotron.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <![endif]-->
+    <script src="/coolparking/js/myPagination.js"></script>
+</head>
+
+<body>
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <br/><br/>
+        <h2 th:text="${'No.'+parkingId}"></h2>
+        <p th:text="${'这里是'+parkingName}"></p>
+        <p><a class="btn btn-primary btn-lg" href="javascript:void(0)" role="button">了解更多&raquo;</a></p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-md-7">
+            <h2>车位信息</h2>
+            <table th:fragment="carportInfo" class="tab">
+                <thead>
+                <th><h3>车位号</h3></th>
+                <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                <th><h3>有车/无车</h3></th>
+                <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                <th><h3>禁用/启用</h3></th>
+                </thead>
+                <tbody align="center">
+                <tr th:each="parkingCarport : ${parkingCarportPage}">
+                    <th scope="row"> <h3 th:text="${parkingCarport.getCarportNum()}"></h3></th>
+                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    <td ><h3 th:id="${parkingCarport.getCarportNum()}" th:text="${parkingCarport.isCarState()?'有车':'无车'}"></h3> </td>
+                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    <td ><h3><a th:href="'javascript:doPost('+${parkingId}+','+${currentPage}+',\''+${parkingCarport.getCarportNum()}+'\','+${parkingCarport.isAbleState()}+')'" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div id="pagination" class="pagination"></div>
+
+        </div>
+        <div class="col-md-4" id="logdiv">
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Print()">
+        打印日志
+    </button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Check()">
+        查看报表
+    </button>
+    <hr>
+    <footer>
+        <p>&copy; 2019 university, Inc.</p>
+    </footer>
+</div> <!-- /container -->
+
+
+<iframe id="myIframe" name="myIframe" style="display: none"></iframe>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    new Page({
+        id: 'pagination',
+        pageTotal: [[${parkingCarportPage.totalPages}]], //总页数
+        pageAmount: [[${size}]],  //每页多少条
+        dataTotal: [[${parkingCarportPage.getTotalElements()}]], //总共多少条数据
+        curPage:[[${currentPage}]], //初始页码,不填默认为1
+        pageSize: 5, //分页个数,不填默认为5
+        showPageTotalFlag:false, //是否显示数据统计,不填默认不显示
+        showSkipInputFlag:true, //是否支持跳转,不填默认不显示
+        getPage: function (page) {
+            //获取当前页数
+            var url = "/coolparking/pservice/update?parkingId="+[[${parkingId}]]+"&page="+(page-1);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function (data) {
+                    $(".tab").html(data);
+                }
+            })
+        }
+    })
+</script>
+<script type="text/javascript" th:inline="javascript">
+    window.onload = function() {
+        GetLogInfo();
+        var test = setInterval(GetLogInfo,1000);
+    }
+    function GetLogInfo()
+    {
+        var request=null;
+        if(window.XMLHttpRequest)
+        {
+            request=new XMLHttpRequest();
+        }else if(window.ActiveXObject)
+        {
+            request=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        if(request)
+        {
+            request.open("POST",'/coolparking/pservice/pgetlog',true);
+            request.onreadystatechange=function()
+            {
+                if(request.readyState===4)
+                {
+                    if (request.status == 200 || request.status == 0)
+                    {
+                        document.getElementById("logdiv").innerHTML="<pre>"+request.responseText+"</pre>";
+                    }
+                }
+            }
+            request.send('{parkingId:'+[[${parkingId}]]+'}');
+        }else{
+            alert("error");
+        }
+    }
+
+    function Print(){
+        bdhtml=window.document.body.innerHTML;
+        sprnstr="<!--startprint-->";
+        eprnstr="<!--endprint-->";
+        prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);
+        prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+    }
+
+    function Check(){
+        var w=screen.availWidth;
+        var h=screen.availHeight;
+        window.open('preport?parkingId='+[[${parkingId}]]+'','','width='+w+',height='+h+',top=0,left=0,toolbar=no,menubar=no,location=no,,status=yes');
+    }
+</script>
+
+<script>
+    function doPost(parkingId,page,carportNum,ableState) {
+        var myForm = document.createElement("form");
+        myForm.method = "post";
+        myForm.action = "/coolparking/pservice/pedit";
+        myForm.setAttribute("target","myIframe");
+        var myInput0 = document.createElement("input");
+        myInput0.setAttribute("name", "parkingId"); // 为input对象设置name
+        myInput0.setAttribute("value", parkingId); // 为input对象设置value
+        var myInput1 = document.createElement("input");
+        myInput1.setAttribute("name", "page"); // 为input对象设置name
+        myInput1.setAttribute("value", page); // 为input对象设置value
+        var myInput2 = document.createElement("input");
+        myInput2.setAttribute("name", "parkingCarportNum"); // 为input对象设置name
+        myInput2.setAttribute("value", carportNum); // 为input对象设置value
+        var myInput3 = document.createElement("input");
+        myInput3.setAttribute("name", "ableState"); // 为input对象设置name
+        myInput3.setAttribute("value", ableState); // 为input对象设置value
+        myForm.appendChild(myInput0);
+        myForm.appendChild(myInput1);
+        myForm.appendChild(myInput2);
+        myForm.appendChild(myInput3);
+        document.body.appendChild(myForm);
+        myForm.submit();
+        document.body.removeChild(myForm); // 提交后移除创建的form
+    }
+</script>
+<script>
+    var websocket = null;
+    if('WebSocket' in window) {
+        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
+        websocket = new WebSocket(path);
+    }else {
+        alert('该浏览器不支持websocket!');
+    }
+
+    websocket.onopen = function (event) {
+        console.log('建立连接');
+    }
+
+    websocket.onclose = function (event) {
+        console.log('连接关闭');
+    }
+
+    websocket.onmessage = function (event) {
+        var res = event.data;
+        if(res=='更新成功'){
+            //局部刷新
+            alert("更新成功");
+            var t=document.activeElement.innerHTML;
+            document.activeElement.innerHTML=t=='禁用'?'启用':'禁用';
+        }
+        else if(res=='更新失败'){
+            alert("更新失败");
+        }
+        else {
+            var json=JSON.parse(res);
+            var t=document.getElementById(json['carportNum']);
+            if(json['io']=='in'){
+                alert('车牌号为'+json['licenseNum']+'\n进入了'+json['carportNum']+'车位');
+                t.innerText='有车';
+            }
+            else if(json['io']=='out'){
+                alert('车牌号为'+json['licenseNum']+'\n离开了'+json['carportNum']+'车位');
+                t.innerText='无车';
+            }
+        }
+    }
+
+    websocket.onerror = function () {
+        alert('websocket通信发生错误！');
+    }
+
+    window.onbeforeunload = function () {
+        websocket.close();
+    }
+</script>
+</body>
+</html>
