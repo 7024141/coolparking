@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container">
+<div class="container" >
     <h1 class="page-header">车库管理员登录</h1>
-    <form id="chform" action="/coolparking/check/login" method="post" target="myIframe">
+    <form id="chform" action="/coolparking/check/login" method="post" target="myIframe" style="width: 90%;float: left" >
         <div class="row">
             <div class="form-group col-sm-7">
                 <label for="parkingId">车库号</label>
@@ -34,7 +34,7 @@
             <input class="btn btn-danger btn-lg col-sm-3" type="reset" value="重置" style="border: 15px solid white">
         </div><br>
     </form>
-    <div class="span12">
+    <div class="span12" style="width: 10%;float: left" >
         <img class="img-polaroid" th:src="'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+${UUID}" />
     </div>
     <iframe id="myIframe" name="myIframe" style="display: none"></iframe>

@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 public class AuthorizeAspect {
-    public static String token = "1001";
+    public static String token = "";
+    public static String UUID = "";
 
     @Autowired
     UserTokenService userTokenService;
@@ -33,12 +34,10 @@ public class AuthorizeAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         Cookie cookie = CookieUtil.get(request, token);
-        if(cookie == null){
-            throw new AuthorizeException();
-        }
+
         //查询value
-        UserToken userToken = userTokenService.findOne(cookie.getValue());
-        if(userToken.isState()){
+        UserToken userToken = userTokenService.findOne(UUID);
+        if(cookie == null || userToken.isState()){
             throw  new AuthorizeException();
         }
     }

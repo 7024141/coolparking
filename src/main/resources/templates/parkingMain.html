@@ -12,6 +12,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Page -->
+    <link rel="stylesheet" href="/coolparking/css/myPagination.css">
 
     <!-- Custom styles for this templates -->
     <link href="jumbotron.css" rel="stylesheet">
@@ -23,6 +25,7 @@
     <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
     <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <![endif]-->
+    <script src="/coolparking/js/myPagination.js"></script>
 </head>
 
 <body>
@@ -59,9 +62,9 @@
 <div class="container">
     <!-- Example row of columns -->
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-7" >
             <h2>车位信息</h2>
-            <table>
+            <table th:fragment="carportInfo" class="tab">
                 <thead>
                 <th><h3>车位号</h3></th>
                 <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
@@ -80,25 +83,27 @@
                 </tbody>
             </table>
 
-            <ul class="pagination right">
-                <li th:class="${currentPage<1?'disabled':''}">
-                    <a th:if="${currentPage < 1}" href="javascript:void(0)">上一页</a>
-                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>
-                </li>
-                <li th:each="number:${#numbers.sequence(0,parkingCarportPage.totalPages - 1)}" th:class="${currentPage==number?'active':''}" >
-                    <a th:if="${currentPage==number}" href="javascript:void(0)">
-                        <span th:text="${number+1}"></span>
-                    </a>
-                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${number})}">
-                        <span th:text="${number+1}"></span>
-                    </a>
-                </li>
-                <li th:class="${currentPage+1 >= parkingCarportPage.totalPages?'disabled':''}">
-                    <a th:if="${currentPage+1 >= parkingCarportPage.totalPages}" href="javascript:void(0)">下一页</a>
-                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>
-                </li>
-            </ul>
+<!--            <ul class="pagination right">-->
+<!--                <li th:class="${currentPage<1?'disabled':''}">-->
+<!--                    <a th:if="${currentPage < 1}" href="javascript:void(0)">上一页</a>-->
+<!--                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>-->
+<!--                </li>-->
+<!--                <li th:each="number:${#numbers.sequence(0,parkingCarportPage.totalPages - 1)}" th:class="${currentPage==number?'active':''}" >-->
+<!--                    <a th:if="${currentPage==number}" href="javascript:void(0)">-->
+<!--                        <span th:text="${number+1}"></span>-->
+<!--                    </a>-->
+<!--                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${number})}">-->
+<!--                        <span th:text="${number+1}"></span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li th:class="${currentPage+1 >= parkingCarportPage.totalPages?'disabled':''}">-->
+<!--                    <a th:if="${currentPage+1 >= parkingCarportPage.totalPages}" href="javascript:void(0)">下一页</a>-->
+<!--                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>-->
+<!--                </li>-->
+<!--            </ul>-->
+            <div id="pagination" class="pagination"></div>
         </div>
+
         <div class="col-md-4" id="logdiv">
         </div>
     </div>
@@ -123,7 +128,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
+                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}+' 元/小时'"></p>
                 <p>您希望的价格是：</p>
                 <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
             </div>
@@ -149,6 +154,31 @@
 <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+
+<script>
+    new Page({
+        id: 'pagination',
+        pageTotal: [[${parkingCarportPage.totalPages}]], //总页数
+        pageAmount: [[${size}]],  //每页多少条
+        dataTotal: [[${parkingCarportPage.getTotalElements()}]], //总共多少条数据
+        curPage:[[${currentPage}]], //初始页码,不填默认为1
+        pageSize: 5, //分页个数,不填默认为5
+        showPageTotalFlag:false, //是否显示数据统计,不填默认不显示
+        showSkipInputFlag:true, //是否支持跳转,不填默认不显示
+        getPage: function (page) {
+            //获取当前页数
+            var url = "/coolparking/pservice/update?parkingId="+[[${parkingId}]]+"&page="+(page-1);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function (data) {
+                    $(".tab").html(data);
+                }
+            })
+        }
+    })
+</script>
+
 <script type="text/javascript" th:inline="javascript">
     window.onload = function() {
         var test = setInterval(GetLogInfo,1000);

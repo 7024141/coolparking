@@ -1,5 +1,6 @@
 package com.example.coolparking.controller;
 
+import com.example.coolparking.VO.ResponseOb;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
@@ -33,9 +34,10 @@ public class ParkingController {
     WebSocket webSocket;
 
     @RequestMapping("/plogin")
-    public String parkingToLogin(Model model){
+    public String parkingToLogin(Model model, HttpServletResponse response){
         String UUID = UUIDUtil.createUUID();
         model.addAttribute("UUID", UUID);
+        ResponseOb.response = response;
         return "parkingLogin";
     }
 
@@ -56,7 +58,23 @@ public class ParkingController {
         model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
         model.addAttribute("parkingCarportPage",parkingCarportPage);
         model.addAttribute("currentPage",page);
+        model.addAttribute("size",size);
         return "parkingMain";
+    }
+
+    @RequestMapping("/update")
+    public String update(Model model,
+                         @RequestParam("parkingId")int parkingId,
+                         @RequestParam(value = "page",defaultValue = "0")int page,
+                         @RequestParam(value = "size",defaultValue = "4")int size){
+        PageRequest pageRequest=PageRequest.of(page,size);
+        Page<ParkingCarport> parkingCarportPage = parkingService.findAll(pageRequest,parkingId);
+        model.addAttribute("parkingId", parkingId);
+        model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
+        model.addAttribute("parkingCarportPage",parkingCarportPage);
+        model.addAttribute("currentPage",page);
+        model.addAttribute("size",size);
+        return "parkingMain::carportInfo";
     }
 
     @RequestMapping("/pedit")
