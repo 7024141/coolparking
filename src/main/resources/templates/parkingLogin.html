@@ -8,11 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="/coolparking/js/md5.js"></script>
 </head>
 <body>
 <div class="container" >
     <h1 class="page-header">车库管理员登录</h1>
-    <form id="chform" action="/coolparking/check/login" method="post" target="myIframe" style="width: 90%;float: left" >
+    <form id="chform" action="/coolparking/check/login" method="post" target="myIframe" style="width: 90%;float: left" onsubmit="return encryption()">
         <div class="row">
             <div class="form-group col-sm-7">
                 <label for="parkingId">车库号</label>
@@ -43,7 +44,20 @@
 
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+<script>
+    function encryption() {
+        var enPwd = document.getElementById("password");
+        if(enPwd.value==null){
+            alert("请输入密码");
+            return false;
+        }
+        else {
+            enPwd.value = hex_md5(enPwd.value);
+            alert(enPwd.value);
+            return true;
+        }
+    }
+</script>
 <script>
     var websocket = null;
     if('WebSocket' in window) {

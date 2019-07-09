@@ -131,34 +131,5 @@
 </script>
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script>
-    window.onbeforeunload=function () {
-        var request=null;
-        if(window.XMLHttpRequest)
-        {
-            request=new XMLHttpRequest();
-        }else if(window.ActiveXObject)
-        {
-            request=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        if(request)
-        {
-            request.open("Get",'/coolparking/check/logout?parkingId='+[[${parkingId}]],false);
-            request.onreadystatechange=function()
-            {
-                if(request.readyState===4)
-                {
-                    if (request.status == 200 || request.status == 0)
-                    {
-                        //成功
-                    }
-                }
-            }
-            request.send();
-        }else{
-            alert("error");
-        }
-    }
-</script>
 </body>
 </html>

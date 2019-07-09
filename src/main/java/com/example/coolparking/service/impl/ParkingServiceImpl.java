@@ -70,7 +70,6 @@ public class ParkingServiceImpl implements ParkingService {
         }
     }
 
-
     @Override
     public String parkingFindName(int parkingId) {
         return parkingInfoDao.findById(parkingId).orElse(null).getParkingName();
@@ -86,7 +85,6 @@ public class ParkingServiceImpl implements ParkingService {
 
         return OrderUtil.modifyTime(parkingOrderDao.findAll());
     }
-
 
     @Override
     public BigDecimal parkingGetPrice(int parkingId){
