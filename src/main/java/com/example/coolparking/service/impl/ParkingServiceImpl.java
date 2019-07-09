@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -134,5 +135,10 @@ public class ParkingServiceImpl implements ParkingService {
         List<ParkingOrder> list=parkingOrderDao.findRecentOrder(parkingId,Time);
         list = OrderUtil.modifyTime(list);
         return list;
+    }
+
+    @Override
+    public List<ParkingOrder> findAllOder(int parkingId,int state, String start, String end){
+        return parkingOrderDao.findTodayOrder(parkingId, state, start, end);
     }
 }
