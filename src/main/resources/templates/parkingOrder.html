@@ -13,8 +13,6 @@
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this templates -->
-    <link href="jumbotron.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -24,27 +22,8 @@
 </head>
 
 <body>
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
-                <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
-                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type=${type})}" >订单</a></li>
-            </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
-        </div>
-    </div>
-</nav>
-
 <!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
+<div>
     <div class="container">
         <br/><br/>
         <h2 th:text="${'No.'+parkingId}"></h2>
@@ -119,7 +98,7 @@
                     <tr th:each="parkingOrder : ${parkingOrders}">
             <span th:if="${!parkingOrder.isOrderState()}">
                 <th scope="row"><h3 th:text="${parkingOrder.getOrderId()}"></h3> </th>
-                <td><h3 th:text="${parkingOrder.getCarportNum()}"></h3></td>
+                <td><h3 th:text="${parkingOrder.getLicenseNum()}"></h3></td>
                 <td><h3 th:text="${parkingOrder.getCreateTime()}"></h3></td>
             </span>
                     </tr>
@@ -141,48 +120,12 @@
     </footer>
 </div> <!-- /container -->
 
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-     aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    价格管理
-                </h4>
-            </div>
-            <div class="modal-body">
-                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
-                <p>您希望的价格是：</p>
-                <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default"
-                        data-dismiss="modal">取消
-                </button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="ModifyUnitPrice()">
-                    提交更改
-                </button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
-</div>
-
-<p id="parkingId" th:text="${parkingId}" style="display: none"></p>
-<p id="parkingPrice" th:text="${parkingPrice}" style="display:none"></p>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
 <script type="text/javascript" th:inline="javascript">
     window.onload=function () {
@@ -216,39 +159,42 @@
             document.getElementById("controlButton1").innerText='显示已完成订单';
         }
     }
-    function ModifyUnitPrice() {
-        let parkingPrice=document.getElementById("parkingPrice").innerText;
-        let newPrice=document.getElementById("newPrice").value;
-        let parkingId=document.getElementById("parkingId").innerText;
-        if(newPrice!=parkingPrice&&newPrice!=null){
-            let ajax = GetXmlHttpObject();
-            let randomNum=new Date().getTime();
-            ajax.onreadystatechange = function () {
-                if (ajax.readyState==4 &&ajax.status==200) {
-                    if(ajax.responseText=="true"){
-                        alert("修改成功！");
-                        document.getElementById("toOrder").click();
-                    }
-                    else {
-                        alert("修改失败！");
-                    }
-                }
-            }
-            ajax.open('post','/coolparking/pservice/pmodifyprice',false);
-            ajax.setRequestHeader('content-type','application/json');
-            ajax.send('{\'parkingId\':'+parkingId+',\'parkingPrice\':'+newPrice+',\'randomNum\':'+randomNum+'}');
-        }
-    }
-    function GetXmlHttpObject(){
-        if (window.XMLHttpRequest){
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp=new XMLHttpRequest();
-        }else{// code for IE6, IE5
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        return xmlhttp;
+</script>
+<script>
+    var websocket = null;
+    if('WebSocket' in window) {
+        var path = "ws://127.0.0.1:8080/coolparking/webSocket/" + [[${UUID}]];
+        websocket = new WebSocket(path);
+    }else {
+        alert('该浏览器不支持websocket!');
     }
 
+    websocket.onopen = function (event) {
+        console.log('建立连接');
+    }
+
+    websocket.onclose = function (event) {
+        console.log('连接关闭');
+    }
+
+    websocket.onmessage = function (event) {
+        var res = event.data;
+        var json=JSON.parse(res);
+        if(json['io']=='in'){
+            alert('车牌号为'+json['licenseNum']+'\n进入了'+json['carportNum']+'车位');
+        }
+        else if(json['io']=='out'){
+            alert('车牌号为'+json['licenseNum']+'\n离开了'+json['carportNum']+'车位');
+        }
+    }
+
+    websocket.onerror = function () {
+        alert('websocket通信发生错误！');
+    }
+
+    window.onbeforeunload = function () {
+        websocket.close();
+    }
 </script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 package com.example.coolparking.controller;
 
-import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.log.Log;
 import com.example.coolparking.service.ParkingService;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.WebParam;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +40,20 @@ public class ParkingController {
     }
 
     @RequestMapping("/pmain")
+    public String test(Model model, HttpServletRequest request,
+                       @RequestParam("parkingId")int parkingId,
+                       @RequestParam(value = "page",defaultValue = "0")int page){
+        Cookie cookie = CookieUtil.get(request, String.valueOf(parkingId));
+        if(cookie != null){
+            model.addAttribute("UUID", cookie.getValue());
+        }
+        model.addAttribute("parkingId", parkingId);
+        model.addAttribute("currentPage",page);
+        model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
+        return "parkingMain";
+    }
+
+    @RequestMapping("/pcarport")
     public String parkingMain(Model model, HttpServletRequest request,
                               @RequestParam("parkingId")int parkingId,
                               @RequestParam(value = "page",defaultValue = "0")int page,
@@ -52,28 +64,33 @@ public class ParkingController {
         if(cookie != null){
             model.addAttribute("UUID", cookie.getValue());
         }
-        //model.addAttribute("parkingCarports", parkingService.parkingFindAllCarports(adminInfo.getParkingId()));
         model.addAttribute("parkingId", parkingId);
         model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
-        model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
         model.addAttribute("parkingCarportPage",parkingCarportPage);
         model.addAttribute("currentPage",page);
-        return "parkingMain";
+        return "parkingCarport";
     }
 
-    @RequestMapping("/pedit")
-    public String parkingEdit(int parkingId,int page,String parkingCarportNum,boolean ableState) {
+    @PostMapping("/pedit")
+    public void pedit( HttpServletRequest request,int parkingId,int page,String parkingCarportNum,boolean ableState) {
+        Cookie cookie = CookieUtil.get(request, String.valueOf(parkingId));
         if (parkingService.parkingCarportEdit(parkingId, parkingCarportNum, ableState)) {
             System.out.println("更新成功");
+            if(cookie != null){
+                webSocket.sendInfo(cookie.getValue(),"更新成功");
+            }
         } else {
             //更新失败
             System.out.println("更新失败");
+            if(cookie != null){
+                webSocket.sendInfo(cookie.getValue(),"更新失败");
+            }
         }
-        return "redirect:/pservice/pmain?parkingId=" + parkingId+"&page="+page;
     }
 
     @RequestMapping("/porder")
-    public String parkingToOrder(Model model,int parkingId,int page,String type){
+    public String parkingToOrder(HttpServletRequest request,Model model,int parkingId,int page,String type){
+        System.out.println(type);
         if(type!=null){
             model.addAttribute("type",type);
             if(type.equals("recentOrder")){
@@ -83,8 +100,11 @@ public class ParkingController {
                 model.addAttribute("parkingOrders",parkingService.parkingFindAllOrders(parkingId));
             }
         }
+        Cookie cookie = CookieUtil.get(request, String.valueOf(parkingId));
+        if(cookie != null){
+            model.addAttribute("UUID", cookie.getValue());
+        }
         model.addAttribute("parkingName", parkingService.parkingFindName(parkingId));
-        model.addAttribute("parkingPrice", parkingService.parkingGetPrice(parkingId).toString());
         model.addAttribute("parkingId",parkingId);
         model.addAttribute("type",type);
         model.addAttribute("currentPage",page);

@@ -27,9 +27,11 @@ public class UserController {
 
     @RequestMapping("ucreateorder")
     @ResponseBody
-    public String createOrder(int parkingId, String carNum){
-        userService.createOrder(parkingId,carNum);
-        return "666";
+    public Map createOrder(int parkingId, String carNum){
+        String result=userService.createOrder(parkingId,carNum);
+        Map<String,Object> map=new HashMap<>();
+        map.put("result",result);
+        return map;
     }
 
     @RequestMapping("/uprice")

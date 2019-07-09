@@ -13,8 +13,6 @@
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this templates -->
-    <link href="jumbotron.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,28 +24,8 @@
 </head>
 
 <body>
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
-                <li><a id="toCarport" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage})}" >车位</a></li>
-                <li><a id="toOrder" th:href="@{/pservice/porder(parkingId=${parkingId},page=${currentPage},type='recentOrder')}" >订单</a></li>
-                <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
-            </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
-        </div>
-    </div>
-</nav>
-
 <!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
+<div>
     <div class="container">
         <br/><br/>
         <h2 th:text="${'No.'+parkingId}"></h2>
@@ -73,9 +51,9 @@
                 <tr th:each="parkingCarport : ${parkingCarportPage}">
                     <th scope="row"> <h3 th:text="${parkingCarport.getCarportNum()}"></h3></th>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <td ><h3 th:text="${parkingCarport.isCarState()?'有车':'无车'}"></h3> </td>
+                    <td ><h3 th:id="${parkingCarport.getCarportNum()}" th:text="${parkingCarport.isCarState()?'有车':'无车'}"></h3> </td>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <td ><h3><a th:href="@{/pservice/pedit(parkingId=${parkingId},page=${currentPage},parkingCarportNum=${parkingCarport.getCarportNum()},ableState=${parkingCarport.isAbleState()})}" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
+                    <td ><h3><a th:href="'javascript:doPost('+${parkingId}+','+${currentPage}+',\''+${parkingCarport.getCarportNum()}+'\','+${parkingCarport.isAbleState()}+')'" th:text="${parkingCarport.isAbleState()?'禁用':'启用'}"></a></h3></td>
                 </tr>
                 </tbody>
             </table>
@@ -83,19 +61,19 @@
             <ul class="pagination right">
                 <li th:class="${currentPage<1?'disabled':''}">
                     <a th:if="${currentPage < 1}" href="javascript:void(0)">上一页</a>
-                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>
+                    <a th:if="${not(currentPage < 1)}" th:href="@{/pservice/pcarport(parkingId=${parkingId},page=${currentPage - 1})}">上一页</a>
                 </li>
                 <li th:each="number:${#numbers.sequence(0,parkingCarportPage.totalPages - 1)}" th:class="${currentPage==number?'active':''}" >
                     <a th:if="${currentPage==number}" href="javascript:void(0)">
                         <span th:text="${number+1}"></span>
                     </a>
-                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${number})}">
+                    <a th:if="${not(currentPage==number)}" th:href="@{/pservice/pcarport(parkingId=${parkingId},page=${number})}">
                         <span th:text="${number+1}"></span>
                     </a>
                 </li>
                 <li th:class="${currentPage+1 >= parkingCarportPage.totalPages?'disabled':''}">
                     <a th:if="${currentPage+1 >= parkingCarportPage.totalPages}" href="javascript:void(0)">下一页</a>
-                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pmain(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>
+                    <a th:if="${not(currentPage+1 >= parkingCarportPage.totalPages)}" th:href="@{/pservice/pcarport(parkingId=${parkingId},page=${currentPage + 1})}">下一页</a>
                 </li>
             </ul>
         </div>
@@ -108,49 +86,18 @@
     </footer>
 </div> <!-- /container -->
 
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-     aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    价格管理
-                </h4>
-            </div>
-            <div class="modal-body">
-                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
-                <p>您希望的价格是：</p>
-                <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default"
-                        data-dismiss="modal">取消
-                </button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="ModifyUnitPrice()">
-                    提交更改
-                </button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
-</div>
 
-<p id="parkingId" th:text="${parkingId}" style="display: none"></p>
-<p id="parkingPrice" th:text="${parkingPrice}" style="display:none"></p>
+<iframe id="myIframe" name="myIframe" style="display: none"></iframe>
+
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script type="text/javascript" th:inline="javascript">
     window.onload = function() {
+        GetLogInfo();
         var test = setInterval(GetLogInfo,1000);
     }
     function GetLogInfo()
@@ -181,40 +128,35 @@
             alert("error");
         }
     }
-    function ModifyUnitPrice() {
-        let parkingPrice=document.getElementById("parkingPrice").innerText;
-        let newPrice=document.getElementById("newPrice").value;
-        let parkingId=document.getElementById("parkingId").innerText;
-        if(newPrice!=parkingPrice&&newPrice!=null){
-            let ajax = GetXmlHttpObject();
-            let randomNum=new Date().getTime();
-            ajax.onreadystatechange = function () {
-                if (ajax.readyState==4 &&ajax.status==200) {
-                    if(ajax.responseText=="true"){
-                        alert("修改成功！");
-                        document.getElementById("toCarport").click();
-                    }
-                    else {
-                        alert("修改失败！");
-                    }
-                }
-            }
-            ajax.open('post','/coolparking/pservice/pmodifyprice',false);
-            ajax.setRequestHeader('content-type','application/json');
-            ajax.send('{\'parkingId\':'+parkingId+',\'parkingPrice\':'+newPrice+',\'randomNum\':'+randomNum+'}');
-        }
-    }
-    function GetXmlHttpObject(){
-        if (window.XMLHttpRequest){
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp=new XMLHttpRequest();
-        }else{// code for IE6, IE5
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        return xmlhttp;
-    }
 </script>
 
+<script>
+    function doPost(parkingId,page,carportNum,ableState) {
+        var myForm = document.createElement("form");
+        myForm.method = "post";
+        myForm.action = "/coolparking/pservice/pedit";
+        myForm.setAttribute("target","myIframe");
+        var myInput0 = document.createElement("input");
+        myInput0.setAttribute("name", "parkingId"); // 为input对象设置name
+        myInput0.setAttribute("value", parkingId); // 为input对象设置value
+        var myInput1 = document.createElement("input");
+        myInput1.setAttribute("name", "page"); // 为input对象设置name
+        myInput1.setAttribute("value", page); // 为input对象设置value
+        var myInput2 = document.createElement("input");
+        myInput2.setAttribute("name", "parkingCarportNum"); // 为input对象设置name
+        myInput2.setAttribute("value", carportNum); // 为input对象设置value
+        var myInput3 = document.createElement("input");
+        myInput3.setAttribute("name", "ableState"); // 为input对象设置name
+        myInput3.setAttribute("value", ableState); // 为input对象设置value
+        myForm.appendChild(myInput0);
+        myForm.appendChild(myInput1);
+        myForm.appendChild(myInput2);
+        myForm.appendChild(myInput3);
+        document.body.appendChild(myForm);
+        myForm.submit();
+        document.body.removeChild(myForm); // 提交后移除创建的form
+    }
+</script>
 <script>
     var websocket = null;
     if('WebSocket' in window) {
@@ -234,8 +176,27 @@
 
     websocket.onmessage = function (event) {
         var res = event.data;
-        alert(res);
-
+        if(res=='更新成功'){
+            //局部刷新
+            alert("更新成功");
+            var t=document.activeElement.innerHTML;
+            document.activeElement.innerHTML=t=='禁用'?'启用':'禁用';
+        }
+        else if(res=='更新失败'){
+            alert("更新失败");
+        }
+        else {
+            var json=JSON.parse(res);
+            var t=document.getElementById(json['carportNum']);
+            if(json['io']=='in'){
+                alert('车牌号为'+json['licenseNum']+'\n进入了'+json['carportNum']+'车位');
+                t.innerText='有车';
+            }
+            else if(json['io']=='out'){
+                alert('车牌号为'+json['licenseNum']+'\n离开了'+json['carportNum']+'车位');
+                t.innerText='无车';
+            }
+        }
     }
 
     websocket.onerror = function () {
