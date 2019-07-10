@@ -1,6 +1,5 @@
 package com.example.coolparking.controller;
 
-import com.example.coolparking.VO.ResponseOb;
 import com.example.coolparking.dataobject.ParkingCarport;
 import com.example.coolparking.dataobject.ParkingOrder;
 import com.example.coolparking.log.Log;
@@ -22,7 +21,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,10 +38,9 @@ public class ParkingController {
     WebSocket webSocket;
 
     @RequestMapping("/plogin")
-    public String parkingToLogin(Model model, HttpServletResponse response){
+    public String parkingToLogin(Model model){
         String UUID = UUIDUtil.createUUID();
         model.addAttribute("UUID", UUID);
-        ResponseOb.addResponse(UUID, response);
         return "parkingLogin";
     }
 
