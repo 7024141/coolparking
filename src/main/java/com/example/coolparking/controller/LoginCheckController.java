@@ -41,7 +41,8 @@ public class LoginCheckController {
         AdminInfo adminInfo = new AdminInfo(adminInfoTrans.getParkingId(), adminInfoTrans.getPassword());
         String result = parkingService.parkingMain(adminInfo);
         webSocket.sendInfo(adminInfoTrans.getUUID(), result);
-        if(result.equals("登录成功")){
+        String str = "登录成功" + adminInfoTrans.getParkingId();
+        if(result.equals(str)){
             AuthorizeAspect.token = String.valueOf(adminInfoTrans.getParkingId());
             AuthorizeAspect.UUID = adminInfoTrans.getUUID();
             //2、创建UUID与value
@@ -74,6 +75,7 @@ public class LoginCheckController {
 
     @GetMapping("/qrlogin")
     public void qrlogin(@RequestParam("openId")String openId, @RequestParam("UUID")String UUID){
+        System.out.println(openId+"*****************"+UUID);
         if(!StringUtils.isEmpty(UUID)){
             //1、AdminInfo中查询openId
             AdminInfo adminInfo = adminInfoService.findByOpenId(openId);

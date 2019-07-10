@@ -77,9 +77,9 @@
     websocket.onmessage = function (event) {
         var res = event.data;
         alert(res);
-        if(res.substring(0,3) == "登录成功"){
+        if(res.substring(0,4) == "登录成功"){
             //var path = "/coolparking/pservice/pmain?parkingId="+$("#parkingId").val();
-            var path = "/coolparking/pservice/pmain?parkingId="+res.substring(4,7).val();
+            var path = "/coolparking/pservice/pmain?parkingId="+res.substring(4);
             console.log(path);
             location.href = path;
         }
