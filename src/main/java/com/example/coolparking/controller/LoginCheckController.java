@@ -40,8 +40,8 @@ public class LoginCheckController {
     public void login(AdminInfoTrans adminInfoTrans){
         AdminInfo adminInfo = new AdminInfo(adminInfoTrans.getParkingId(), adminInfoTrans.getPassword());
         String result = parkingService.parkingMain(adminInfo);
-        webSocket.sendInfo(adminInfoTrans.getUUID(), result);
-        String str = "登录成功" + adminInfoTrans.getParkingId();
+
+        String str = "登录成功" ;
         if(result.equals(str)){
             AuthorizeAspect.token = String.valueOf(adminInfoTrans.getParkingId());
             AuthorizeAspect.UUID = adminInfoTrans.getUUID();
@@ -53,13 +53,19 @@ public class LoginCheckController {
             //3、将UUID插入cookie
             //CookieUtil.set(response, String.valueOf(adminInfoTrans.getParkingId()), adminInfoTrans.getUUID(), 600);
         }
+        webSocket.sendInfo(adminInfoTrans.getUUID(), result);
     }
 
     @PostMapping("/setcookie")
+    @ResponseBody
     public ResultVO setcookie(HttpServletResponse response,
                               @RequestParam("UUID")String UUID){
         UserToken userToken = userTokenService.findOne(UUID);
+        System.out.println(userToken);
+        System.out.println("kkkk");
         if(userToken != null){
+            AuthorizeAspect.token = String.valueOf(userToken.getValue());
+            AuthorizeAspect.UUID = UUID;
             CookieUtil.set(response, userToken.getValue(), UUID, 600);
             ResultVO resultVO = new ResultVO(0, userToken.getValue());
             return resultVO;
@@ -85,6 +91,7 @@ public class LoginCheckController {
     }
 
     @GetMapping("/qrlogin")
+    @ResponseBody
     public void qrlogin(@RequestParam("openId")String openId, @RequestParam("UUID")String UUID){
         System.out.println(openId+"*****************"+UUID);
         if(!StringUtils.isEmpty(UUID)){
