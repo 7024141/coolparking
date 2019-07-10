@@ -43,7 +43,7 @@ public class ParkingController {
     public String parkingToLogin(Model model, HttpServletResponse response){
         String UUID = UUIDUtil.createUUID();
         model.addAttribute("UUID", UUID);
-        ResponseOb.response = response;
+        ResponseOb.addResponse(UUID, response);
         return "parkingLogin";
     }
 

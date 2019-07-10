@@ -57,7 +57,7 @@ public class ParkingServiceImpl implements ParkingService {
                 String path = ".\\txtlog\\"+ai.getParkingId()+"-"+dateTime2+".txt";
                 Log.bwFile( path, content,true);
 
-                return "登录成功";
+                return "登录成功"+adminInfo.getParkingId();
             }
             else {
                 System.out.println("密码错误");

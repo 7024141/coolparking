@@ -51,6 +51,7 @@ public class LoginCheckController {
 
             //3、将UUID插入cookie
             CookieUtil.set(response, String.valueOf(adminInfoTrans.getParkingId()), adminInfoTrans.getUUID(), 600);
+            ResponseOb.remResponse(adminInfoTrans.getUUID());
         }
     }
 
@@ -82,11 +83,14 @@ public class LoginCheckController {
                 userToken.setLoginTime(new Date());
                 userTokenService.saveOne(userToken);
 
-                if(ResponseOb.response != null){
-                    CookieUtil.set(ResponseOb.response, String.valueOf(adminInfo.getParkingId()), UUID, 600);
+                HttpServletResponse response = ResponseOb.get(UUID);
+                if(response != null){
+                    CookieUtil.set(response, String.valueOf(adminInfo.getParkingId()), UUID, 600);
                 }
                 //3、发送消息
-                webSocket.sendInfo(UUID, "登录成功");
+                String msg = "登录成功"+adminInfo.getParkingId();
+                ResponseOb.remResponse(UUID);
+                webSocket.sendInfo(UUID, msg);
             }else{
                 webSocket.sendInfo(UUID, "没有登录权限");
             }
