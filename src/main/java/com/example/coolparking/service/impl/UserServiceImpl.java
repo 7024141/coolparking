@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public String createOrder(int parkingId,String carNum) {
         String tableName=parkingInfoDao.findById(parkingId).orElse(null).getCarportTable();
         List<ParkingCarport> psc=parkingCarportDao.parkingFindFreeCarports(tableName);
-        if(psc==null){
+        if(psc.size()==0){
             return "车位满了";
         }
         ParkingCarport pc=psc.get(0);

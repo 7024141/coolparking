@@ -66,7 +66,7 @@
         <div class="col-md-4" id="logdiv">
         </div><!--endprint-->
     </div>
-    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Print()">
+    <button  type="button" class="btn btn-primary" data-dismiss="modal" onclick="Print()">
         打印日志
     </button>
     <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Check()">
@@ -111,37 +111,46 @@
     })
 </script>
 <script type="text/javascript" th:inline="javascript">
+    var test;
     window.onload = function() {
         GetLogInfo();
-        var test = setInterval(GetLogInfo,1000);
+        test = setInterval(GetLogInfo,1000);
+
     }
     function GetLogInfo()
     {
-        var request=null;
-        if(window.XMLHttpRequest)
-        {
-            request=new XMLHttpRequest();
-        }else if(window.ActiveXObject)
-        {
-            request=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        if(request)
-        {
-            request.open("POST",'/coolparking/pservice/pgetlog',true);
-            request.onreadystatechange=function()
+        if(document.getElementById("pre")==null||document.getElementById("pre").scrollHeight - document.getElementById("pre").scrollTop === document.getElementById("pre").clientHeight){
+
+            var request=null;
+            if(window.XMLHttpRequest)
             {
-                if(request.readyState===4)
+                request=new XMLHttpRequest();
+            }else if(window.ActiveXObject)
+            {
+                request=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            if(request)
+            {
+                request.open("POST",'/coolparking/pservice/pgetlog',true);
+                request.onreadystatechange=function()
                 {
-                    if (request.status == 200 || request.status == 0)
+                    if(request.readyState===4)
                     {
-                        document.getElementById("logdiv").innerHTML="<pre>"+request.responseText+"</pre>";
+                        if (request.status == 200 || request.status == 0)
+                        {
+                            document.getElementById("logdiv").innerHTML="<pre id=\"pre\" style=\" overflow-y:scroll;width:450px; height: 400px\">"+request.responseText+"</pre>";
+                            if(document.getElementById("pre")!=null){
+                                document.getElementById("pre").scrollTop=document.getElementById("pre").scrollHeight;
+                            }
+                        }
                     }
                 }
+                request.send('{parkingId:'+[[${parkingId}]]+'}');
+            }else{
+                alert("error");
             }
-            request.send('{parkingId:'+[[${parkingId}]]+'}');
-        }else{
-            alert("error");
         }
+
     }
 
     function Print(){
