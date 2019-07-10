@@ -31,11 +31,14 @@
                 <a class="navbar-brand" href="javascript:void(0)">酷泊车</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
+                <div class="navbar-form navbar-right">
+                    <button class="btn btn-success" onclick="javascript:document.getElementById('logout').click();">登出</button>
+                </div>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="javascript:void(0)" data-toggle="modal" data-target="#myModal">价格</a></li>
                     <li><a id="toCarport" href="javascript:changeToCarport()">车位</a></li>
                     <li><a id="toOrder"  href="javascript:changeToOrder()">订单</a></li>
-                    <li><a id="logout" th:href="@{/check/logout(parkingId=${parkingId})}"> 登出</a></li>
+                    <li><a id="logout" th:href="@{/check/logout(parkingId=${parkingId})}" style="display: none"></a></li>
                     <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
                 </ul>
                 <form class="navbar-form navbar-right">
@@ -63,7 +66,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}"></p>
+                <p id="currentPrice" th:text="'当前价格为：'+${parkingPrice}+' 元/小时'"></p>
                 <p>您希望的价格是：</p>
                 <input id="newPrice" type="text" th:placeholder="${parkingPrice}" />
             </div>

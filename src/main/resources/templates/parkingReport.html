@@ -2,20 +2,55 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/coolparking/css/jumbotron-narrow.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body>
-    <div>
-        <h4 th:text="${'停车场编号：'+parkingId}"></h4>
-        <h4 th:text="${'停车场名字：'+parkingName}"></h4>
-        <h4 th:text="${'停车场单价：'+parkingPrice}"></h4>
-        <h4 th:text="${'今日总计收入：'+totalPrice}+'元'"></h4>
-        <h4 th:text="${'今日出库车辆：'+totalCarNum+'辆'}"></h4>
-        <h4 th:text="${'昨日总计收入：'+totalYePrice}+'元'"></h4>
-        <h4 th:text="${'昨日出库车辆：'+YeCarNum+'辆'}"></h4>
+<div class="container">
+    <div class="header clearfix">
+        <h3 class="text-muted">酷泊车</h3>
     </div>
 
-    <canvas id="barChart" height="400" width="600" style="margin:50px" > 你的浏览器不支持HTML5 canvas </canvas>
+    <div class="jumbotron">
+        <h2>Report</h2>
+        <p class="lead" th:text="${'停车场编号：'+parkingId}"></p>
+        <p class="lead" th:text="${'停车场名字：'+parkingName}"></p>
+        <p class="lead" th:text="${'停车场单价：'+parkingPrice}"></p>
+        <p class="lead" th:text="${'今日总计收入：'+totalPrice}+'元'"></p>
+        <p class="lead" th:text="${'今日出库车辆：'+totalCarNum+'辆'}"></p>
+        <p class="lead" th:text="${'昨日总计收入：'+totalYePrice}+'元'"></p>
+        <p class="lead" th:text="${'昨日出库车辆：'+YeCarNum+'辆'}"></p>
+    </div>
+
+    <div class="row marketing">
+        <canvas id="barChart" height="400" width="600" style="margin:50px" > 你的浏览器不支持HTML5 canvas </canvas>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2019 university, Inc.</p>
+    </footer>
+
+</div> <!-- /container -->
+<!--    <div>-->
+<!--        <h4 th:text="${'停车场编号：'+parkingId}"></h4>-->
+<!--        <h4 th:text="${'停车场名字：'+parkingName}"></h4>-->
+<!--        <h4 th:text="${'停车场单价：'+parkingPrice}"></h4>-->
+<!--        <h4 th:text="${'今日总计收入：'+totalPrice}+'元'"></h4>-->
+<!--        <h4 th:text="${'今日出库车辆：'+totalCarNum+'辆'}"></h4>-->
+<!--        <h4 th:text="${'昨日总计收入：'+totalYePrice}+'元'"></h4>-->
+<!--        <h4 th:text="${'昨日出库车辆：'+YeCarNum+'辆'}"></h4>-->
+<!--    </div>-->
+
+<!--    <canvas id="barChart" height="400" width="600" style="margin:50px" > 你的浏览器不支持HTML5 canvas </canvas>-->
 
     <script type="text/javascript" th:inline="javascript">
         //封装绘制图表的方法
