@@ -77,9 +77,21 @@
     websocket.onmessage = function (event) {
         var res = event.data;
         alert(res);
-        if(res.substring(0,4) == "登录成功"){
+        if(res == "登录成功"){
             //var path = "/coolparking/pservice/pmain?parkingId="+$("#parkingId").val();
-            var path = "/coolparking/pservice/pmain?parkingId="+res.substring(4);
+            //插入cookie
+            var parkingId = "";
+            var url = "/coolparking/check/setcookie?UUID="+[[${UUID}]];
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType:"JSON",
+                success: function (result) {
+                    console.log(result);
+                    parkingId = result.msg;
+                }
+            })
+            var path = "/coolparking/pservice/pmain?parkingId="+parkingId;
             console.log(path);
             location.href = path;
         }

@@ -1,7 +1,7 @@
 package com.example.coolparking.controller;
 
 import com.example.coolparking.VO.AdminInfoTrans;
-import com.example.coolparking.VO.ResponseOb;
+import com.example.coolparking.VO.ResultVO;
 import com.example.coolparking.aspect.AuthorizeAspect;
 import com.example.coolparking.dataobject.AdminInfo;
 import com.example.coolparking.dataobject.UserToken;
@@ -37,7 +37,7 @@ public class LoginCheckController {
     AdminInfoService adminInfoService;
 
     @PostMapping("/login")
-    public void login(AdminInfoTrans adminInfoTrans, HttpServletResponse response){
+    public void login(AdminInfoTrans adminInfoTrans){
         AdminInfo adminInfo = new AdminInfo(adminInfoTrans.getParkingId(), adminInfoTrans.getPassword());
         String result = parkingService.parkingMain(adminInfo);
         webSocket.sendInfo(adminInfoTrans.getUUID(), result);
@@ -51,9 +51,20 @@ public class LoginCheckController {
             userTokenService.saveOne(userToken);
 
             //3、将UUID插入cookie
-            CookieUtil.set(response, String.valueOf(adminInfoTrans.getParkingId()), adminInfoTrans.getUUID(), 600);
-            ResponseOb.remResponse(adminInfoTrans.getUUID());
+            //CookieUtil.set(response, String.valueOf(adminInfoTrans.getParkingId()), adminInfoTrans.getUUID(), 600);
         }
+    }
+
+    @PostMapping("/setcookie")
+    public ResultVO setcookie(HttpServletResponse response,
+                              @RequestParam("UUID")String UUID){
+        UserToken userToken = userTokenService.findOne(UUID);
+        if(userToken != null){
+            CookieUtil.set(response, userToken.getValue(), UUID, 600);
+            ResultVO resultVO = new ResultVO(0, userToken.getValue());
+            return resultVO;
+        }
+        else return null;
     }
 
     @GetMapping("/logout")
@@ -85,14 +96,8 @@ public class LoginCheckController {
                 userToken.setLoginTime(new Date());
                 userTokenService.saveOne(userToken);
 
-                HttpServletResponse response = ResponseOb.get(UUID);
-                if(response != null){
-                    CookieUtil.set(response, String.valueOf(adminInfo.getParkingId()), UUID, 600);
-                }
                 //3、发送消息
-                String msg = "登录成功"+adminInfo.getParkingId();
-                ResponseOb.remResponse(UUID);
-                webSocket.sendInfo(UUID, msg);
+                webSocket.sendInfo(UUID, "登录成功");
             }else{
                 webSocket.sendInfo(UUID, "没有登录权限");
             }
