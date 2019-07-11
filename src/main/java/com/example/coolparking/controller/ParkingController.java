@@ -136,6 +136,22 @@ public class ParkingController {
 
 
     @RequestMapping("/pmodifyprice")
+//    public String parkingModifyPrice(Model model, HttpServletRequest request) throws JSONException {
+//        int len = request.getContentLength();
+//        byte[] callbackBody = new byte[len];
+//        try {
+//            ServletInputStream sis = request.getInputStream();
+//            sis.read(callbackBody, 0, len);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        //接收json数据
+//        JSONObject jsonObject = new JSONObject(new String(callbackBody));
+//        if(parkingService.parkingSetPrice(jsonObject.getInt("parkingId"), jsonObject.getString("parkingPrice"))){
+//            model.addAttribute("parkingPrice",jsonObject.getString("parkingPrice"));
+//        }
+//        return "parkingMain::modal";
+//    }
     public void parkingModifyPrice(HttpServletRequest request,HttpServletResponse response) throws IOException, JSONException {
         int len = request.getContentLength();
         byte[] callbackBody = new byte[len];

@@ -33,6 +33,7 @@ public class AuthorizeAspect {
     public void doVerify(){
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
+
         Cookie cookie = CookieUtil.get(request, token);
 
         //查询value
